@@ -1,0 +1,7 @@
+node_modules/
+dist/
+*.log
+.DS_Store
+
+# Base de datos SQLite: se crea sola al iniciar el servidor.
+server/datos/
