@@ -1,5 +1,5 @@
 /*
- * App: une los 13 patrones UI. Versión con backend (Express + SQLite).
+ * App: une los 16 patrones UI (6 categorías). Versión con backend (Express + SQLite).
  * - Al iniciar pide laboratorios, clases y reservas a la API (src/api.js). Mientras tanto
  *   se ve el skeleton (mínimo 1 s, para que se note en la demo).
  * - MODO DE RESPALDO: si el servidor no responde, usa los datos de src/data.js y guarda
@@ -151,20 +151,24 @@ const COLUMNAS_BUSQUEDA = [
   },
 ];
 
+// Catálogo de los 16 patrones, agrupados en 6 categorías según el problema que resuelven.
 const PATRONES = [
-  { numero: 1, nombre: 'Búsqueda global', descripcion: 'Filtra laboratorios y materias mientras escribes.', donde: 'En la cabecera (atajo: tecla /)' },
-  { numero: 2, nombre: 'Menú hamburguesa', descripcion: 'Agrupa la navegación en pantallas de menos de 768 px. Se cierra con Escape.', donde: 'En la cabecera, en móvil' },
-  { numero: 3, nombre: 'Modo claro/oscuro', descripcion: 'Cambia el tema con variables CSS y recuerda tu elección.', donde: 'Botón de luna/sol en la cabecera' },
-  { numero: 4, nombre: 'Migas de pan', descripcion: 'Muestran dónde estás y te llevan de vuelta en un clic.', donde: 'Ir al Lab 236-43', href: '#/laboratorios/236-43' },
-  { numero: 5, nombre: 'Pestañas', descripcion: 'Separan Información, Horario y Reservar. Se recorren con las flechas.', donde: 'Ir al Lab 236-43', href: '#/laboratorios/236-43' },
-  { numero: 6, nombre: 'Tarjetas', descripcion: 'Resumen de cada laboratorio con su estado y una sola acción.', donde: 'Ir a Laboratorios', href: '#/laboratorios' },
-  { numero: 7, nombre: 'Skeleton de carga', descripcion: 'Dibuja la forma del contenido mientras llegan los datos del servidor.', donde: 'Ir a Laboratorios («Recargar»)', href: '#/laboratorios' },
-  { numero: 8, nombre: 'Estado vacío', descripcion: 'Explica que no hubo resultados y ofrece «Limpiar búsqueda».', donde: 'Probar búsqueda sin resultados', accion: 'vacio' },
-  { numero: 9, nombre: 'Validación en línea', descripcion: 'Revisa cada campo al salir de él; el servidor vuelve a validar al guardar.', donde: 'Reservar el Lab 236-44', href: '#/laboratorios/236-44/reservar' },
-  { numero: 10, nombre: 'Modal de confirmación', descripcion: 'Pide confirmación antes de cancelar una reserva.', donde: 'Ir a Mis reservas', href: '#/reservas' },
-  { numero: 11, nombre: 'Toast', descripcion: 'Avisa «Reserva registrada» o «Reserva cancelada» y se oculta a los 3 s.', donde: 'Al registrar o cancelar una reserva' },
-  { numero: 12, nombre: 'Paginación', descripcion: 'Divide el horario del laboratorio en páginas de 5 filas.', donde: 'Horario del Lab 236-41', href: '#/laboratorios/236-41/horario' },
-  { numero: 13, nombre: 'Acordeón', descripcion: 'Preguntas frecuentes con un solo panel abierto a la vez.', donde: 'Ir a Ayuda', href: '#/ayuda' },
+  { numero: 1, categoria: 'Navegación', nombre: 'Menú hamburguesa', descripcion: 'Agrupa la navegación en pantallas de menos de 768 px. Se cierra con Escape.', donde: 'En la cabecera, en móvil' },
+  { numero: 2, categoria: 'Navegación', nombre: 'Migas de pan', descripcion: 'Muestran dónde estás y te llevan de vuelta en un clic.', donde: 'Ir al Lab 236-43', href: '#/laboratorios/236-43' },
+  { numero: 3, categoria: 'Navegación', nombre: 'Pestañas', descripcion: 'Separan Información, Horario y Reservar. Se recorren con las flechas.', donde: 'Ir al Lab 236-43', href: '#/laboratorios/236-43' },
+  { numero: 4, categoria: 'Navegación', nombre: 'Paginación', descripcion: 'Divide el horario del laboratorio en páginas de 5 filas.', donde: 'Horario del Lab 236-41', href: '#/laboratorios/236-41/horario' },
+  { numero: 5, categoria: 'Navegación', nombre: 'Estado activo', descripcion: 'El menú resalta la sección en la que estás (aria-current).', donde: 'En el menú de la cabecera' },
+  { numero: 6, categoria: 'Búsqueda', nombre: 'Búsqueda global', descripcion: 'Filtra laboratorios y materias mientras escribes.', donde: 'En la cabecera (atajo: tecla /)' },
+  { numero: 7, categoria: 'Entrada de datos', nombre: 'Validación en línea', descripcion: 'Revisa cada campo al salir de él; el servidor vuelve a validar al guardar.', donde: 'Reservar el Lab 236-44', href: '#/laboratorios/236-44/reservar' },
+  { numero: 8, categoria: 'Presentación', nombre: 'Tarjetas', descripcion: 'Resumen de cada laboratorio con su estado y una sola acción.', donde: 'Ir a Laboratorios', href: '#/laboratorios' },
+  { numero: 9, categoria: 'Presentación', nombre: 'Acordeón', descripcion: 'Preguntas frecuentes con un solo panel abierto a la vez.', donde: 'Ir a Ayuda', href: '#/ayuda' },
+  { numero: 10, categoria: 'Presentación', nombre: 'Insignias de estado', descripcion: 'Etiquetas «Disponible / Mantenimiento» y contador de reservas: el estado de un vistazo.', donde: 'Ir a Laboratorios', href: '#/laboratorios' },
+  { numero: 11, categoria: 'Retroalimentación', nombre: 'Toast', descripcion: 'Avisa «Reserva registrada» o «Reserva cancelada» y se oculta a los 3 s.', donde: 'Al registrar o cancelar una reserva' },
+  { numero: 12, categoria: 'Retroalimentación', nombre: 'Skeleton de carga', descripcion: 'Dibuja la forma del contenido mientras llegan los datos del servidor.', donde: 'Ir a Laboratorios («Recargar»)', href: '#/laboratorios' },
+  { numero: 13, categoria: 'Retroalimentación', nombre: 'Estado vacío', descripcion: 'Explica que no hubo resultados y ofrece «Limpiar búsqueda».', donde: 'Probar búsqueda sin resultados', accion: 'vacio' },
+  { numero: 14, categoria: 'Retroalimentación', nombre: 'Modal de confirmación', descripcion: 'Pide confirmación antes de cancelar una reserva.', donde: 'Ir a Mis reservas', href: '#/reservas' },
+  { numero: 15, categoria: 'Retroalimentación', nombre: 'Aviso de conexión', descripcion: 'Si el servidor no responde, lo explica, usa datos locales y ofrece «Reintentar».', donde: 'Aparece con el servidor apagado' },
+  { numero: 16, categoria: 'Personalización', nombre: 'Modo claro/oscuro', descripcion: 'Cambia el tema con variables CSS y recuerda tu elección.', donde: 'Botón de luna/sol en la cabecera' },
 ];
 
 // ---------- Vistas ----------
@@ -223,9 +227,12 @@ function VistaInicio({ refTitulo, cargando, laboratorios, clases, totalReservas,
 
       <section className="seccion" aria-labelledby="titulo-patrones">
         <h2 id="titulo-patrones" className="subtitulo">
-          Los 13 patrones de esta demo
+          Los 16 patrones de esta demo
         </h2>
-        <p className="seccion-intro">Cada patrón resuelve un problema concreto de uso. Ábrelo para verlo funcionando.</p>
+        <p className="seccion-intro">
+          16 patrones en 6 categorías: navegación, búsqueda, entrada de datos, presentación, retroalimentación y
+          personalización. Cada uno resuelve un problema concreto de uso.
+        </p>
         <ol className="lista-patrones">
           {PATRONES.map((patron) => (
             <li key={patron.numero} className="patron">
@@ -233,6 +240,7 @@ function VistaInicio({ refTitulo, cargando, laboratorios, clases, totalReservas,
                 {patron.numero}
               </span>
               <div>
+                <p className="patron-categoria">{patron.categoria}</p>
                 <h3 className="patron-nombre">{patron.nombre}</h3>
                 <p className="patron-descripcion">{patron.descripcion}</p>
                 <p className="patron-donde">
@@ -248,10 +256,6 @@ function VistaInicio({ refTitulo, cargando, laboratorios, clases, totalReservas,
             </li>
           ))}
         </ol>
-        <p className="nota">
-          Extra de la versión con backend: si el servidor no responde, aparece un aviso con «Reintentar» y la app sigue
-          funcionando con datos locales (modo de respaldo).
-        </p>
       </section>
     </>
   );
@@ -599,7 +603,7 @@ export default function App() {
     refTitulo.current?.focus({ preventScroll: true });
   }, [ruta]);
 
-  // Patrón 3: el tema vive en <html data-tema="…"> y las variables CSS hacen el resto.
+  // Patrón «Modo claro/oscuro»: el tema vive en <html data-tema="…"> y las variables CSS hacen el resto.
   useEffect(() => {
     document.documentElement.setAttribute('data-tema', tema);
   }, [tema]);
@@ -643,7 +647,7 @@ export default function App() {
     if (origen === 'local') guardarAlmacen(CLAVE_RESERVAS, JSON.stringify(reservas));
   }, [reservas, origen]);
 
-  // Patrón 1: búsqueda global en vivo.
+  // Patrón «Búsqueda global»: filtra en vivo.
   const { laboratorios, clases } = datos;
   const termino = normalizar(busqueda.trim());
   const clasesEncontradas = useMemo(() => {

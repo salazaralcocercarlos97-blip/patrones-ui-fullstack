@@ -1,5 +1,5 @@
 /*
- * Patrón extra (versión con backend): AVISO DE CONEXIÓN / MODO DE RESPALDO.
+ * Patrón: AVISO DE CONEXIÓN / MODO DE RESPALDO (categoría: retroalimentación).
  * Problema que resuelve: si el servidor no responde, la app no debe quedar en blanco ni
  * fallar en silencio. Se explica qué pasó, qué significa para el usuario (sus reservas se
  * guardan solo en este navegador) y se ofrece una salida: «Reintentar».

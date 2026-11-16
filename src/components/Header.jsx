@@ -1,9 +1,11 @@
 /*
- * Patrones: BÚSQUEDA GLOBAL + MENÚ HAMBURGUESA + MODO CLARO/OSCURO.
+ * Patrones: BÚSQUEDA GLOBAL + MENÚ HAMBURGUESA + ESTADO ACTIVO + MODO CLARO/OSCURO.
  * Problema que resuelve: el usuario necesita llegar rápido a cualquier laboratorio
  * o materia desde cualquier página (búsqueda siempre visible, atajo «/»), navegar
  * en pantallas pequeñas sin que el menú ocupe toda la pantalla (hamburguesa < 768 px,
- * se cierra con Escape) y leer cómodamente según la luz del ambiente (tema que se recuerda).
+ * se cierra con Escape), saber siempre en qué sección está (ESTADO ACTIVO: el enlace actual se
+ * resalta y lleva aria-current="page") y leer cómodamente según la luz (tema que se recuerda).
+ * El contador de reservas junto a «Mis reservas» es una INSIGNIA DE ESTADO (ver LabCard.jsx).
  */
 import { useEffect, useRef, useState } from 'react';
 

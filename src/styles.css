@@ -696,13 +696,16 @@ fieldset:disabled .boton {
 
 .tarjeta-cabecera {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
 }
 
+/* El código del lab no se parte; si no entra junto a la insignia, la insignia baja de línea. */
 .tarjeta-titulo {
   font-size: 1.25rem;
+  white-space: nowrap;
 }
 
 .tarjeta-ubicacion {
@@ -1639,4 +1642,14 @@ fieldset:disabled .boton {
 .pie-origen {
   margin-top: 4px !important;
   font-size: 0.8125rem;
+}
+
+/* Categoría de cada patrón en la lista de Inicio */
+.patron-categoria {
+  margin-bottom: 2px;
+  color: var(--texto-suave);
+  font-size: 0.75rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }

@@ -2,7 +2,7 @@
 
 Proyecto demostrativo de **Patrones UI** para **INF513 Tecnología Web – Grupo 08 SA (2/2026)**.
 
-Es la misma SPA de `patrones-ui` (React + Vite, JavaScript), ahora con:
+Es la SPA de `patrones-ui` (React + Vite, JavaScript) con **16 patrones UI en 6 categorías**, ahora con:
 
 - **Backend:** API REST con **Node + Express**.
 - **Base de datos:** **SQLite** (un archivo, sin instalar ningún servidor de base de datos). Usa el módulo
@@ -46,24 +46,26 @@ restricciones `CHECK` (estado del lab, día 1–6, tipo de reserva, motivo de 10
 Para ver la base de datos con una interfaz gráfica, abre `server/datos/laboratorios.db` con
 [DB Browser for SQLite](https://sqlitebrowser.org/).
 
-## Los 13 patrones y dónde verlos
+## Los 16 patrones (6 categorías) y dónde verlos
 
-| # | Patrón | Componente | Dónde verlo en la app |
-|---|--------|------------|-----------------------|
-| 1 | Búsqueda global | `Header.jsx` | Cabecera. Escribe `INF120`, `236-43` o un apellido; la tecla `/` lleva el foco a la búsqueda. |
-| 2 | Menú hamburguesa | `Header.jsx` | Cabecera con la ventana a menos de 768 px. Se cierra con `Escape`. |
-| 3 | Modo claro/oscuro | `Header.jsx` + `styles.css` | Botón de luna/sol. Cambia `data-tema="oscuro"` en `<html>` y se recuerda en `localStorage`. |
-| 4 | Migas de pan | `Breadcrumbs.jsx` | Inicio › Laboratorios › Lab 236-43. |
-| 5 | Pestañas | `Tabs.jsx` | Detalle de un laboratorio: Información / Horario / Reservar. Se recorren con ← →. |
-| 6 | Tarjetas | `LabCard.jsx` | Página Laboratorios. |
-| 7 | Skeleton de carga | `Skeleton.jsx` | Mientras llegan los datos del servidor (mínimo 1 s) y con el botón «Recargar». |
-| 8 | Estado vacío | `EmptyState.jsx` | Busca `química` → «Limpiar búsqueda». También en Mis reservas sin reservas. |
-| 9 | Validación en línea | `ReservaForm.jsx` + `reglas.js` | Pestaña Reservar. Los errores del servidor también aparecen junto al campo. |
-| 10 | Modal de confirmación | `Modal.jsx` | Mis reservas → «Cancelar reserva». Mientras el servidor responde dice «Cancelando…». |
-| 11 | Toast | `Toast.jsx` | «Reserva registrada» / «Reserva cancelada» (3 s). Si el servidor falla, un aviso de error (6 s). |
-| 12 | Paginación | `TablaPaginada.jsx` | Pestaña Horario (Lab 236-41 tiene 2 páginas). |
-| 13 | Acordeón | `Accordion.jsx` | Ayuda → Preguntas frecuentes. |
-| + | Aviso de conexión (extra) | `AvisoConexion.jsx` | Aparece si el backend está apagado. Botón «Reintentar». |
+| # | Categoría | Patrón | Componente | Dónde verlo en la app |
+|---|---|---|---|---|
+| 1 | Navegación | Menú hamburguesa | `Header.jsx` | Cabecera con la ventana a menos de 768 px. Se cierra con `Escape`. |
+| 2 | Navegación | Migas de pan | `Breadcrumbs.jsx` | Inicio › Laboratorios › Lab 236-43. |
+| 3 | Navegación | Pestañas | `Tabs.jsx` | Detalle de un laboratorio: Información / Horario / Reservar. Se recorren con ← →. |
+| 4 | Navegación | Paginación | `TablaPaginada.jsx` | Pestaña Horario (Lab 236-41 tiene 2 páginas). |
+| 5 | Navegación | Estado activo | `Header.jsx` | El enlace de la sección actual se resalta y lleva `aria-current="page"`. |
+| 6 | Búsqueda | Búsqueda global | `Header.jsx` + `App.jsx` | Escribe `INF120`, `236-43` o un apellido; la tecla `/` lleva el foco a la búsqueda. |
+| 7 | Entrada de datos | Validación en línea | `ReservaForm.jsx` + `reglas.js` | Pestaña Reservar. Los errores del servidor también aparecen junto al campo. |
+| 8 | Presentación | Tarjetas | `LabCard.jsx` | Página Laboratorios. |
+| 9 | Presentación | Acordeón | `Accordion.jsx` | Ayuda → Preguntas frecuentes. |
+| 10 | Presentación | Insignias de estado | `LabCard.jsx` (`EstadoBadge`) + `Header.jsx` | «Disponible / Mantenimiento» en las tarjetas y el contador de reservas en el menú. |
+| 11 | Retroalimentación | Toast | `Toast.jsx` | «Reserva registrada» / «Reserva cancelada» (3 s). Si el servidor falla, un aviso de error (6 s). |
+| 12 | Retroalimentación | Skeleton de carga | `Skeleton.jsx` | Mientras llegan los datos del servidor (mínimo 1 s) y con el botón «Recargar». |
+| 13 | Retroalimentación | Estado vacío | `EmptyState.jsx` | Busca `química` → «Limpiar búsqueda». También en Mis reservas sin reservas. |
+| 14 | Retroalimentación | Modal de confirmación | `Modal.jsx` | Mis reservas → «Cancelar reserva». Mientras el servidor responde dice «Cancelando…». |
+| 15 | Retroalimentación | Aviso de conexión | `AvisoConexion.jsx` | Aparece si el backend está apagado. Botón «Reintentar». |
+| 16 | Personalización | Modo claro/oscuro | `Header.jsx` + `styles.css` | Botón de luna/sol. Cambia `data-tema="oscuro"` en `<html>` y se recuerda en `localStorage`. |
 
 ## Estructura
 

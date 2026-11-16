@@ -7,6 +7,11 @@
  */
 import { useId } from 'react';
 
+/*
+ * Patrón: INSIGNIAS DE ESTADO (badges).
+ * Problema que resuelve: saber el estado de algo sin abrirlo. La etiqueta usa color Y texto
+ * («Disponible» / «Mantenimiento»), así no depende solo del color (accesible para daltónicos).
+ */
 export function EstadoBadge({ estado }) {
   const enMantenimiento = estado === 'MANTENIMIENTO';
   return (
