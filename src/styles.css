@@ -2,8 +2,11 @@
  * Estilos globales.
  * - Variables CSS (--fondo, --texto, --primario…) para el tema claro y el oscuro:
  *   cambiar <html data-tema="oscuro"> reasigna las variables y toda la app cambia de color.
- * - Responsive de 375 px a 1280 px (móvil primero; cortes en 600, 768 y 1100 px).
+ * - Responsive de 320 px a 1440 px (móvil primero; cortes en 600, 768, 1000 y 1100 px).
+ *   Por debajo de 600 px las tablas se muestran como tarjetas apiladas (dato + rótulo).
  * - Foco visible en todo lo interactivo y contraste AA en ambos temas.
+ * - Principios CRAP: una sola escala de espaciado (--espacio-1…8), un solo alto de control
+ *   (--alto-control) y un solo relleno de tarjeta (--relleno-tarjeta) para toda la app.
  */
 
 /* ---------- Tema claro (por defecto) ---------- */
@@ -50,6 +53,22 @@
 
   --radio: 8px;
   --radio-grande: 12px;
+
+  /* Escala de espaciado (Repetición y Proximidad): todo margen, relleno y separación sale de aquí.
+     Dentro de un grupo se usan los pasos 1–4; entre secciones, --espacio-seccion. */
+  --espacio-1: 4px;
+  --espacio-2: 8px;
+  --espacio-3: 12px;
+  --espacio-4: 16px;
+  --espacio-5: 20px;
+  --espacio-6: 24px;
+  --espacio-7: 32px;
+  --espacio-8: 48px;
+  --espacio-seccion: var(--espacio-7);
+  --relleno-tarjeta: var(--espacio-5);
+  --ancho-tarjeta: 280px;
+  /* Alto mínimo de todo lo que se toca (botones, enlaces de navegación, filtros): 44 px. */
+  --alto-control: 44px;
   --fuente: 'Segoe UI', system-ui, -apple-system, 'Noto Sans', Ubuntu, Cantarell, Roboto, sans-serif;
   --duracion: 160ms;
 }
@@ -224,7 +243,7 @@ svg {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 16px;
+  padding: 0 var(--espacio-4);
 }
 
 .saltar-contenido {
@@ -232,7 +251,7 @@ svg {
   top: 8px;
   left: 8px;
   z-index: 100;
-  padding: 10px 16px;
+  padding: var(--espacio-3) var(--espacio-4);
   background: var(--superficie);
   color: var(--primario);
   border-radius: var(--radio);
@@ -249,9 +268,9 @@ svg {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  min-height: 44px;
-  padding: 10px 18px;
+  gap: var(--espacio-2);
+  min-height: var(--alto-control);
+  padding: var(--espacio-3) var(--espacio-5);
   border: 1px solid transparent;
   border-radius: var(--radio);
   font-weight: 600;
@@ -321,8 +340,8 @@ svg {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: var(--alto-control);
+  height: var(--alto-control);
   padding: 0;
   border: 1px solid transparent;
   border-radius: var(--radio);
@@ -353,22 +372,23 @@ fieldset:disabled .boton {
   position: relative;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 10px 16px 12px;
+  padding: var(--espacio-3) var(--espacio-4) var(--espacio-3);
   display: grid;
   grid-template-columns: 1fr auto auto;
   grid-template-areas:
     'marca tema menu'
     'busqueda busqueda busqueda';
   align-items: center;
-  gap: 8px 4px;
+  gap: var(--espacio-2) var(--espacio-1);
 }
 
 .marca {
   grid-area: marca;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  min-width: 0;
+  gap: var(--espacio-3);
+  min-width: var(--alto-control);
+  min-height: var(--alto-control);
   color: var(--cabecera-texto);
   text-decoration: none;
 }
@@ -427,7 +447,7 @@ fieldset:disabled .boton {
   background: var(--cabecera-fondo);
   border-top: 1px solid rgba(255, 255, 255, 0.16);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
-  padding: 8px 16px 16px;
+  padding: var(--espacio-2) var(--espacio-4) var(--espacio-4);
 }
 
 .nav-principal.abierto {
@@ -443,9 +463,9 @@ fieldset:disabled .boton {
 .nav-principal a {
   display: flex;
   align-items: center;
-  gap: 8px;
-  min-height: 48px;
-  padding: 8px 12px;
+  gap: var(--espacio-2);
+  min-height: var(--alto-control);
+  padding: var(--espacio-2) var(--espacio-3);
   border-radius: var(--radio);
   color: var(--cabecera-texto);
   text-decoration: none;
@@ -468,7 +488,7 @@ fieldset:disabled .boton {
   justify-content: center;
   min-width: 22px;
   height: 22px;
-  padding: 0 6px;
+  padding: 0 var(--espacio-2);
   border-radius: 999px;
   background: #ffffff;
   color: #1f4e79;
@@ -493,8 +513,8 @@ fieldset:disabled .boton {
 
 .busqueda input {
   width: 100%;
-  min-height: 44px;
-  padding: 8px 40px 8px 40px;
+  min-height: var(--alto-control);
+  padding: var(--espacio-2) 40px var(--espacio-2) 40px;
   border: 1px solid transparent;
   border-radius: var(--radio);
   background: #ffffff;
@@ -514,7 +534,7 @@ fieldset:disabled .boton {
   position: absolute;
   right: 10px;
   display: none;
-  padding: 1px 7px;
+  padding: 1px var(--espacio-2);
   border: 1px solid #b8c3d0;
   border-radius: 4px;
   background: #f4f6f9;
@@ -554,8 +574,8 @@ fieldset:disabled .boton {
 /* ---------- Contenido ---------- */
 .principal {
   flex: 1;
-  padding-top: 20px;
-  padding-bottom: 48px;
+  padding-top: var(--espacio-5);
+  padding-bottom: var(--espacio-8);
 }
 
 .principal:focus {
@@ -563,7 +583,8 @@ fieldset:disabled .boton {
 }
 
 .migas {
-  margin-bottom: 16px;
+  /* Los enlaces miden 44 px de alto; el margen negativo conserva la distancia visual al título. */
+  margin: calc(-1 * var(--espacio-3)) 0 var(--espacio-2);
   font-size: 0.9375rem;
 }
 
@@ -571,19 +592,22 @@ fieldset:disabled .boton {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 4px;
+  gap: var(--espacio-1);
 }
 
 .migas li {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--espacio-1);
   color: var(--texto-suave);
 }
 
 .migas a {
-  display: inline-block;
-  padding: 4px 2px;
+  display: inline-flex;
+  align-items: center;
+  min-width: var(--alto-control);
+  min-height: var(--alto-control);
+  padding: 0;
 }
 
 .migas [aria-current='page'] {
@@ -593,7 +617,7 @@ fieldset:disabled .boton {
 
 .migas-separador {
   color: var(--texto-suave);
-  padding: 0 4px;
+  padding: 0 var(--espacio-1);
 }
 
 .titulo-pagina {
@@ -601,30 +625,30 @@ fieldset:disabled .boton {
   flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px 16px;
-  margin-bottom: 20px;
+  gap: var(--espacio-3) var(--espacio-4);
+  margin-bottom: var(--espacio-6);
 }
 
 .titulo-sub {
-  margin-top: 4px;
+  margin-top: var(--espacio-1);
   color: var(--texto-suave);
 }
 
 .subtitulo {
-  margin-bottom: 12px;
+  margin-bottom: var(--espacio-3);
 }
 
 .seccion {
-  margin-top: 32px;
+  margin-top: var(--espacio-seccion);
 }
 
 .seccion-intro {
-  margin: -4px 0 16px;
+  margin: calc(-1 * var(--espacio-1)) 0 var(--espacio-4);
   color: var(--texto-suave);
 }
 
 .nota {
-  margin-top: 20px;
+  margin-top: var(--espacio-6);
   color: var(--texto-suave);
 }
 
@@ -633,19 +657,19 @@ fieldset:disabled .boton {
 }
 
 .resultado-resumen {
-  margin-bottom: 16px;
+  margin-bottom: var(--espacio-4);
   color: var(--texto-suave);
 }
 
 .acciones {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: var(--espacio-3);
 }
 
 /* Portada (inicio) */
 .portada {
-  padding: 24px;
+  padding: var(--espacio-6);
   border: 1px solid var(--borde);
   border-radius: var(--radio-grande);
   background: var(--superficie);
@@ -653,7 +677,7 @@ fieldset:disabled .boton {
 }
 
 .portada-etiqueta {
-  margin-bottom: 8px;
+  margin-bottom: var(--espacio-2);
   color: var(--texto-suave);
   font-size: 0.875rem;
   font-weight: 600;
@@ -662,7 +686,7 @@ fieldset:disabled .boton {
 
 .portada-texto {
   max-width: 60ch;
-  margin: 12px 0 20px;
+  margin: var(--espacio-3) 0 var(--espacio-5);
   color: var(--texto-suave);
   font-size: 1.0625rem;
 }
@@ -670,11 +694,12 @@ fieldset:disabled .boton {
 /* ---------- Grillas y tarjetas ---------- */
 .grilla {
   display: grid;
-  gap: 16px;
+  gap: var(--espacio-4);
 }
 
+/* 280 px como mínimo: en escritorio los 6 laboratorios quedan en 3 × 2 y cada código entra en una línea con su insignia. */
 .grilla-tarjetas {
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(var(--ancho-tarjeta), 100%), 1fr));
 }
 
 .grilla-datos {
@@ -691,8 +716,8 @@ fieldset:disabled .boton {
 .tarjeta-lab {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 20px;
+  gap: var(--espacio-3);
+  padding: var(--relleno-tarjeta);
 }
 
 .tarjeta-cabecera {
@@ -700,7 +725,7 @@ fieldset:disabled .boton {
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--espacio-2);
 }
 
 /* El código del lab no se parte; si no entra junto a la insignia, la insignia baja de línea. */
@@ -710,7 +735,7 @@ fieldset:disabled .boton {
 }
 
 .tarjeta-ubicacion {
-  margin-top: -6px;
+  margin-top: calc(-1 * var(--espacio-2));
   color: var(--texto-suave);
   font-size: 0.9375rem;
 }
@@ -718,8 +743,8 @@ fieldset:disabled .boton {
 .tarjeta-datos {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  padding: 12px 0;
+  gap: var(--espacio-2);
+  padding: var(--espacio-3) 0;
   border-top: 1px solid var(--borde);
   border-bottom: 1px solid var(--borde);
 }
@@ -749,7 +774,7 @@ fieldset:disabled .boton {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: 16px;
+  padding: var(--relleno-tarjeta);
 }
 
 .dato-valor {
@@ -767,8 +792,8 @@ fieldset:disabled .boton {
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 3px 10px;
+  gap: var(--espacio-2);
+  padding: 3px var(--espacio-3);
   border-radius: 999px;
   font-size: 0.8125rem;
   font-weight: 650;
@@ -801,7 +826,7 @@ fieldset:disabled .boton {
 /* ---------- Pestañas ---------- */
 .pestanas-lista {
   display: flex;
-  gap: 4px;
+  gap: var(--espacio-1);
   box-shadow: inset 0 -1px 0 var(--borde);
   overflow-x: auto;
   overflow-y: hidden;
@@ -810,8 +835,8 @@ fieldset:disabled .boton {
 
 .pestanas-lista [role='tab'] {
   position: relative;
-  min-height: 44px;
-  padding: 10px 16px;
+  min-height: var(--alto-control);
+  padding: var(--espacio-3) var(--espacio-4);
   border: 0;
   border-radius: var(--radio) var(--radio) 0 0;
   background: transparent;
@@ -845,7 +870,7 @@ fieldset:disabled .boton {
 }
 
 .pestanas-panel {
-  padding-top: 20px;
+  padding-top: var(--espacio-5);
 }
 
 .pestanas-panel:focus-visible {
@@ -855,11 +880,11 @@ fieldset:disabled .boton {
 /* Detalle del laboratorio */
 .info-lab {
   display: grid;
-  gap: 24px;
+  gap: var(--espacio-6);
 }
 
 .info-lab > section > p {
-  margin-bottom: 16px;
+  margin-bottom: var(--espacio-4);
   color: var(--texto-suave);
   max-width: 65ch;
 }
@@ -876,7 +901,7 @@ fieldset:disabled .boton {
   display: grid;
   grid-template-columns: 1fr;
   gap: 2px;
-  padding: 12px 16px;
+  padding: var(--espacio-3) var(--espacio-4);
 }
 
 .lista-datos > div + div {
@@ -892,7 +917,7 @@ fieldset:disabled .boton {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
+  gap: var(--espacio-2);
 }
 
 .dato-nota {
@@ -903,11 +928,11 @@ fieldset:disabled .boton {
 .chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--espacio-2);
 }
 
 .chips li {
-  padding: 6px 12px;
+  padding: var(--espacio-2) var(--espacio-3);
   border: 1px solid var(--borde);
   border-radius: 999px;
   background: var(--superficie);
@@ -931,7 +956,7 @@ fieldset:disabled .boton {
 
 .tabla th,
 .tabla td {
-  padding: 12px 14px;
+  padding: var(--espacio-3) var(--espacio-4);
   text-align: left;
   vertical-align: top;
 }
@@ -955,8 +980,8 @@ fieldset:disabled .boton {
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-top: 12px;
+  gap: var(--espacio-3);
+  margin-top: var(--espacio-3);
 }
 
 .paginacion-resumen {
@@ -967,13 +992,13 @@ fieldset:disabled .boton {
 .paginacion-lista {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: var(--espacio-2);
 }
 
 .boton-pagina {
-  min-width: 44px;
-  min-height: 44px;
-  padding: 8px 12px;
+  min-width: var(--alto-control);
+  min-height: var(--alto-control);
+  padding: var(--espacio-2) var(--espacio-3);
   border: 1px solid var(--borde-campo);
   border-radius: var(--radio);
   background: var(--superficie);
@@ -1004,17 +1029,17 @@ fieldset:disabled .boton {
 }
 
 .formulario-titulo {
-  margin-bottom: 6px;
+  margin-bottom: var(--espacio-2);
 }
 
 .formulario-intro {
-  margin-bottom: 20px;
+  margin-bottom: var(--espacio-5);
   color: var(--texto-suave);
 }
 
 .formulario-campos {
   display: grid;
-  gap: 18px;
+  gap: var(--espacio-5);
   margin: 0;
   padding: 0;
   border: 0;
@@ -1024,14 +1049,14 @@ fieldset:disabled .boton {
 .campo {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--espacio-2);
   min-width: 0;
 }
 
 .campo-fila {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 18px;
+  gap: var(--espacio-5);
 }
 
 .campo label {
@@ -1042,8 +1067,8 @@ fieldset:disabled .boton {
 .campo select,
 .campo textarea {
   width: 100%;
-  min-height: 44px;
-  padding: 9px 12px;
+  min-height: var(--alto-control);
+  padding: var(--espacio-2) var(--espacio-3);
   border: 1px solid var(--borde-campo);
   border-radius: var(--radio);
   background: var(--superficie);
@@ -1078,7 +1103,7 @@ fieldset:disabled .boton {
 .campo-ayuda {
   display: flex;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--espacio-2);
   color: var(--texto-suave);
   font-size: 0.875rem;
 }
@@ -1086,7 +1111,7 @@ fieldset:disabled .boton {
 .campo-error {
   display: flex;
   align-items: flex-start;
-  gap: 6px;
+  gap: var(--espacio-2);
   color: var(--peligro);
   font-size: 0.9375rem;
   font-weight: 600;
@@ -1100,8 +1125,8 @@ fieldset:disabled .boton {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 12px 16px;
-  margin-top: 4px;
+  gap: var(--espacio-3) var(--espacio-4);
+  margin-top: var(--espacio-1);
 }
 
 .formulario-resumen {
@@ -1117,9 +1142,9 @@ fieldset:disabled .boton {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 12px;
-  margin: 12px 0 20px;
-  padding: 16px;
+  gap: var(--espacio-3);
+  margin: var(--espacio-3) 0 var(--espacio-5);
+  padding: var(--espacio-4);
   border-radius: var(--radio-grande);
 }
 
@@ -1132,26 +1157,32 @@ fieldset:disabled .boton {
 /* ---------- Mis reservas ---------- */
 .lista-reservas {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(min(var(--ancho-tarjeta), 100%), 1fr));
+  gap: var(--espacio-4);
 }
 
 .reserva {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 20px;
+  gap: var(--espacio-3);
+  padding: var(--relleno-tarjeta);
 }
 
 .reserva-cabecera {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--espacio-2);
 }
 
 .reserva-titulo {
   font-size: 1.125rem;
+}
+
+.reserva-titulo a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--alto-control);
 }
 
 .reserva-fecha {
@@ -1172,8 +1203,8 @@ fieldset:disabled .boton {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 40px 20px;
+  gap: var(--espacio-3);
+  padding: var(--espacio-8) var(--espacio-5);
   border: 1px dashed var(--borde-campo);
   border-radius: var(--radio-grande);
   background: var(--superficie);
@@ -1186,7 +1217,7 @@ fieldset:disabled .boton {
 
 .vacio-mensaje {
   max-width: 52ch;
-  margin-bottom: 8px;
+  margin-bottom: var(--espacio-2);
   color: var(--texto-suave);
 }
 
@@ -1194,29 +1225,29 @@ fieldset:disabled .boton {
 .skeleton-tarjeta {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 20px;
+  gap: var(--espacio-4);
+  padding: var(--espacio-5);
   min-height: 248px;
 }
 
 .skeleton-dato {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 16px;
+  gap: var(--espacio-3);
+  padding: var(--espacio-4);
 }
 
 .skeleton-fila {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--espacio-3);
 }
 
 .skeleton-lineas {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding-top: 8px;
+  gap: var(--espacio-4);
+  padding-top: var(--espacio-2);
 }
 
 .skeleton-bloque {
@@ -1267,10 +1298,10 @@ fieldset:disabled .boton {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: var(--espacio-4);
   width: 100%;
   min-height: 56px;
-  padding: 14px 20px;
+  padding: var(--espacio-4) var(--espacio-5);
   border: 0;
   background: transparent;
   color: var(--texto);
@@ -1296,7 +1327,7 @@ fieldset:disabled .boton {
 }
 
 .acordeon-panel {
-  padding: 0 20px 18px;
+  padding: 0 var(--espacio-5) var(--espacio-5);
   color: var(--texto-suave);
   max-width: 70ch;
 }
@@ -1309,7 +1340,7 @@ fieldset:disabled .boton {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
+  padding: var(--espacio-4);
   background: var(--velo);
   animation: aparecer var(--duracion) ease-out;
 }
@@ -1317,7 +1348,7 @@ fieldset:disabled .boton {
 .modal {
   width: 100%;
   max-width: 460px;
-  padding: 24px;
+  padding: var(--espacio-6);
   border: 1px solid var(--borde);
   border-radius: var(--radio-grande);
   background: var(--superficie);
@@ -1327,7 +1358,7 @@ fieldset:disabled .boton {
 }
 
 .modal-titulo {
-  margin-bottom: 10px;
+  margin-bottom: var(--espacio-3);
 }
 
 .modal-cuerpo {
@@ -1338,8 +1369,8 @@ fieldset:disabled .boton {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
-  gap: 12px;
-  margin-top: 24px;
+  gap: var(--espacio-3);
+  margin-top: var(--espacio-6);
 }
 
 @keyframes aparecer {
@@ -1370,9 +1401,9 @@ fieldset:disabled .boton {
 .toast {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--espacio-3);
   max-width: 420px;
-  padding: 12px 8px 12px 16px;
+  padding: var(--espacio-3) var(--espacio-2) var(--espacio-3) var(--espacio-4);
   border-radius: var(--radio-grande);
   background: var(--toast-fondo);
   color: var(--toast-texto);
@@ -1401,9 +1432,9 @@ fieldset:disabled .boton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  margin-left: 4px;
+  width: var(--alto-control);
+  height: var(--alto-control);
+  margin-left: var(--espacio-1);
   border: 0;
   border-radius: var(--radio);
   background: transparent;
@@ -1420,7 +1451,7 @@ fieldset:disabled .boton {
 
 /* ---------- Pie ---------- */
 .pie {
-  padding: 20px 0;
+  padding: var(--espacio-5) 0;
   border-top: 1px solid var(--borde);
   background: var(--superficie);
   color: var(--texto-suave);
@@ -1437,27 +1468,27 @@ fieldset:disabled .boton {
   .lista-datos > div {
     grid-template-columns: 140px 1fr;
     align-items: baseline;
-    gap: 16px;
+    gap: var(--espacio-4);
   }
 
   .portada {
-    padding: 32px;
+    padding: var(--espacio-7);
   }
 }
 
 /* Menú hamburguesa solo por debajo de 768 px. */
 @media (min-width: 768px) {
   .contenedor {
-    padding: 0 24px;
+    padding: 0 var(--espacio-6);
   }
 
   .cabecera-interior {
-    padding: 12px 24px 14px;
+    padding: var(--espacio-3) var(--espacio-6) var(--espacio-4);
     grid-template-columns: auto 1fr auto;
     grid-template-areas:
       'marca nav tema'
       'busqueda busqueda busqueda';
-    gap: 10px 16px;
+    gap: var(--espacio-3) var(--espacio-4);
   }
 
   .boton-hamburguesa {
@@ -1478,12 +1509,12 @@ fieldset:disabled .boton {
 
   .nav-principal ul {
     flex-direction: row;
-    gap: 4px;
+    gap: var(--espacio-1);
   }
 
   .nav-principal a {
-    min-height: 44px;
-    padding: 8px 12px;
+    min-height: var(--alto-control);
+    padding: var(--espacio-2) var(--espacio-3);
     white-space: nowrap;
   }
 
@@ -1496,7 +1527,7 @@ fieldset:disabled .boton {
   }
 
   .principal {
-    padding-top: 28px;
+    padding-top: var(--espacio-7);
   }
 
   h1 {
@@ -1571,9 +1602,9 @@ fieldset:disabled .boton {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 12px 16px;
-  margin-bottom: 20px;
-  padding: 14px 16px;
+  gap: var(--espacio-3) var(--espacio-4);
+  margin-bottom: var(--espacio-5);
+  padding: var(--espacio-4) var(--espacio-4);
   border: 1px solid currentColor;
   border-radius: var(--radio-grande);
   background: var(--aviso-fondo);
@@ -1613,7 +1644,7 @@ fieldset:disabled .boton {
 }
 
 .pie-origen {
-  margin-top: 4px !important;
+  margin-top: var(--espacio-1) !important;
   font-size: 0.8125rem;
 }
 
@@ -1669,10 +1700,10 @@ fieldset:disabled .boton {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 14px;
+  gap: var(--espacio-4);
   min-height: 250px;
-  margin-top: 24px;
-  padding: 32px;
+  margin-top: var(--espacio-seccion);
+  padding: var(--espacio-7);
   border: 1px solid var(--borde);
   border-radius: var(--radio-grande);
   background: var(--superficie);
@@ -1681,7 +1712,7 @@ fieldset:disabled .boton {
 /* ---------- Carrusel principal ---------- */
 .carrusel {
   position: relative;
-  margin-top: 24px;
+  margin-top: var(--espacio-seccion);
   border-radius: var(--radio-grande);
   background: var(--carrusel-fondo);
   color: var(--carrusel-texto);
@@ -1703,8 +1734,9 @@ fieldset:disabled .boton {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
-  padding: 68px 20px 16px;
+  gap: var(--espacio-6);
+  /* Arriba deja lugar para el botón «Pausar» (alto de control + su margen). */
+  padding: calc(var(--alto-control) + 2 * var(--espacio-3)) var(--espacio-5) var(--espacio-4);
   opacity: 0;
   visibility: hidden;
   transition:
@@ -1723,7 +1755,7 @@ fieldset:disabled .boton {
 }
 
 .carrusel-etiqueta {
-  margin-bottom: 6px;
+  margin-bottom: var(--espacio-2);
   color: var(--carrusel-suave);
   font-size: 0.8125rem;
   font-weight: 650;
@@ -1737,7 +1769,7 @@ fieldset:disabled .boton {
 }
 
 .carrusel-descripcion {
-  margin: 10px 0 18px;
+  margin: var(--espacio-3) 0 var(--espacio-5);
   color: var(--carrusel-suave);
   font-size: 1.0625rem;
 }
@@ -1763,10 +1795,10 @@ fieldset:disabled .boton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  min-width: 40px;
-  min-height: 40px;
-  padding: 0 10px;
+  gap: var(--espacio-2);
+  min-width: var(--alto-control);
+  min-height: var(--alto-control);
+  padding: 0 var(--espacio-3);
   border: 1px solid var(--carrusel-borde);
   border-radius: var(--radio);
   background: var(--carrusel-boton);
@@ -1781,10 +1813,10 @@ fieldset:disabled .boton {
 
 .carrusel-rotacion {
   position: absolute;
-  top: 14px;
-  right: 14px;
+  top: var(--espacio-3);
+  right: var(--espacio-3);
   z-index: 1;
-  padding: 0 12px 0 10px;
+  padding: 0 var(--espacio-3) 0 var(--espacio-3);
 }
 
 .carrusel-controles {
@@ -1792,8 +1824,10 @@ fieldset:disabled .boton {
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 8px 12px;
-  padding: 0 14px 14px 12px;
+  gap: var(--espacio-2) var(--espacio-3);
+  /* El punto activo (22 px dentro de un botón de 44 px) queda alineado con el texto de la
+     diapositiva y las flechas con el borde derecho del botón «Pausar» (Alineación). */
+  padding: 0 var(--espacio-3) var(--espacio-4) calc(var(--espacio-5) - (var(--alto-control) - 22px) / 2);
 }
 
 .carrusel-puntos {
@@ -1805,8 +1839,8 @@ fieldset:disabled .boton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: var(--alto-control);
+  height: var(--alto-control);
   padding: 0;
   border: 0;
   border-radius: var(--radio);
@@ -1835,11 +1869,12 @@ fieldset:disabled .boton {
 .carrusel-flechas {
   display: flex;
   align-items: center;
-  gap: 6px;
+  margin-left: auto;
+  gap: var(--espacio-2);
 }
 
 .carrusel-contador {
-  margin-right: 4px;
+  margin-right: var(--espacio-1);
   color: var(--carrusel-suave);
   font-size: 0.875rem;
   font-variant-numeric: tabular-nums;
@@ -1851,9 +1886,9 @@ fieldset:disabled .boton {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
-  gap: 14px 24px;
-  margin-bottom: 16px;
-  padding: 16px;
+  gap: var(--espacio-4) var(--espacio-6);
+  margin-bottom: var(--espacio-4);
+  padding: var(--relleno-tarjeta);
 }
 
 .filtros-titulo {
@@ -1864,7 +1899,7 @@ fieldset:disabled .boton {
 .filtros-grupos {
   display: flex;
   flex-wrap: wrap;
-  gap: 14px 28px;
+  gap: var(--espacio-4) var(--espacio-6);
   flex: 1 1 auto;
   min-width: 0;
 }
@@ -1877,7 +1912,7 @@ fieldset:disabled .boton {
 }
 
 .filtro-grupo legend {
-  margin-bottom: 6px;
+  margin-bottom: var(--espacio-2);
   padding: 0;
   color: var(--texto-suave);
   font-size: 0.875rem;
@@ -1887,7 +1922,7 @@ fieldset:disabled .boton {
 .filtro-opciones {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: var(--espacio-2);
 }
 
 .filtro-opcion {
@@ -1909,9 +1944,9 @@ fieldset:disabled .boton {
 .filtro-opcion span {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  min-height: 40px;
-  padding: 6px 14px;
+  gap: var(--espacio-2);
+  min-height: var(--alto-control);
+  padding: var(--espacio-2) var(--espacio-4);
   border: 1px solid var(--borde-campo);
   border-radius: 999px;
   background: var(--superficie);
@@ -1954,7 +1989,7 @@ fieldset:disabled .boton {
 /* ---------- Panel del encargado: menú lateral ---------- */
 .panel {
   display: grid;
-  gap: 20px;
+  gap: var(--espacio-5);
 }
 
 .panel-contenido {
@@ -1972,8 +2007,8 @@ fieldset:disabled .boton {
 /* Móvil: barra horizontal desplazable (el desplazamiento queda dentro de la barra). */
 .menu-lateral ul {
   display: flex;
-  gap: 4px;
-  padding: 4px;
+  gap: var(--espacio-1);
+  padding: var(--espacio-1);
   overflow-x: auto;
   border: 1px solid var(--borde);
   border-radius: var(--radio-grande);
@@ -1984,9 +2019,9 @@ fieldset:disabled .boton {
 .menu-lateral a {
   display: flex;
   align-items: center;
-  gap: 8px;
-  min-height: 44px;
-  padding: 8px 12px;
+  gap: var(--espacio-2);
+  min-height: var(--alto-control);
+  padding: var(--espacio-2) var(--espacio-3);
   border-radius: var(--radio);
   color: var(--texto-suave);
   font-weight: 600;
@@ -2010,22 +2045,22 @@ fieldset:disabled .boton {
 }
 
 .menu-lateral-nota {
-  margin-top: 8px;
+  margin-top: var(--espacio-2);
   color: var(--texto-suave);
   font-size: 0.8125rem;
 }
 
 /* ---------- Panel de control: tarjetas KPI y barras de progreso ---------- */
+/* Mismo espacio entre tarjetas que en el resto de grillas (Repetición). */
 .grilla-kpi {
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 12px;
 }
 
 .kpi {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: 16px;
+  padding: var(--relleno-tarjeta);
 }
 
 .kpi-icono {
@@ -2034,7 +2069,7 @@ fieldset:disabled .boton {
   justify-content: center;
   width: 40px;
   height: 40px;
-  margin-bottom: 10px;
+  margin-bottom: var(--espacio-3);
   border-radius: 10px;
   background: var(--primario-suave);
   color: var(--primario);
@@ -2068,36 +2103,36 @@ fieldset:disabled .boton {
 
 .panel-columnas {
   display: grid;
-  gap: 16px;
-  margin-top: 16px;
+  gap: var(--espacio-4);
+  margin-top: var(--espacio-4);
 }
 
 .panel-bloque {
-  padding: 20px;
+  padding: var(--relleno-tarjeta);
 }
 
 .panel-bloque-titulo {
-  margin-bottom: 4px;
+  margin-bottom: var(--espacio-1);
   font-size: 1.125rem;
 }
 
 .panel-bloque-texto {
-  margin-bottom: 16px;
+  margin-bottom: var(--espacio-4);
   color: var(--texto-suave);
   font-size: 0.9375rem;
 }
 
 .lista-barras {
   display: grid;
-  gap: 14px;
+  gap: var(--espacio-4);
 }
 
 .barra-cabecera {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 4px 8px;
-  margin-bottom: 6px;
+  gap: var(--espacio-1) var(--espacio-2);
+  margin-bottom: var(--espacio-2);
 }
 
 .barra-etiqueta {
@@ -2135,13 +2170,13 @@ fieldset:disabled .boton {
 }
 
 .barra-detalle {
-  margin-top: 4px;
+  margin-top: var(--espacio-1);
   color: var(--texto-suave);
   font-size: 0.8125rem;
 }
 
 .lista-proximas li {
-  padding: 10px 0;
+  padding: var(--espacio-3) 0;
   border-top: 1px solid var(--borde);
 }
 
@@ -2154,7 +2189,7 @@ fieldset:disabled .boton {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--espacio-2);
 }
 
 .proxima-fecha {
@@ -2163,22 +2198,25 @@ fieldset:disabled .boton {
 }
 
 .enlace-flecha {
-  display: inline-block;
-  margin-top: 12px;
-  padding: 4px 0;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espacio-1);
+  min-height: var(--alto-control);
+  margin-top: var(--espacio-2);
   font-weight: 600;
 }
 
 /* ---------- Tabla de datos: acciones por fila ---------- */
 .acciones-fila {
   display: flex;
-  gap: 6px;
-  margin-block: -7px; /* centra los botones con la primera línea de texto de la fila */
+  gap: var(--espacio-2);
+  /* Botones de 44 px que no agrandan la fila: se centran con la primera línea de texto. */
+  margin-block: calc((1.5em - var(--alto-control)) / 2);
 }
 
 .boton-fila {
-  min-height: 36px;
-  padding: 6px 12px;
+  min-height: var(--alto-control);
+  padding: var(--espacio-2) var(--espacio-3);
   border: 1px solid var(--borde-campo);
   border-radius: var(--radio);
   background: var(--superficie);
@@ -2214,8 +2252,8 @@ fieldset:disabled .boton {
 
 /* ---------- Ventana modal: variantes informativa y con formulario ---------- */
 .modal {
-  max-height: calc(100vh - 32px);
-  max-height: calc(100dvh - 32px);
+  max-height: calc(100vh - 2 * var(--espacio-4));
+  max-height: calc(100dvh - 2 * var(--espacio-4));
   overflow-y: auto;
 }
 
@@ -2228,7 +2266,7 @@ fieldset:disabled .boton {
 }
 
 .lista-datos-modal {
-  margin-top: 4px;
+  margin-top: var(--espacio-1);
 }
 
 .lista-datos-modal dd {
@@ -2236,15 +2274,15 @@ fieldset:disabled .boton {
 }
 
 .formulario-modal .formulario-intro {
-  margin-bottom: 16px;
+  margin-bottom: var(--espacio-4);
 }
 
 .formulario-modal .formulario-campos {
-  gap: 14px;
+  gap: var(--espacio-4);
 }
 
 .formulario-modal .campo-fila {
-  gap: 14px 18px;
+  gap: var(--espacio-4) var(--espacio-5);
 }
 
 .formulario-modal .campo textarea {
@@ -2253,7 +2291,7 @@ fieldset:disabled .boton {
 
 .formulario-acciones-modal {
   justify-content: flex-end;
-  margin-top: 20px;
+  margin-top: var(--espacio-5);
 }
 
 .formulario-acciones-modal .formulario-resumen {
@@ -2267,7 +2305,7 @@ fieldset:disabled .boton {
 }
 
 .campo-radios legend {
-  margin-bottom: 4px;
+  margin-bottom: var(--espacio-1);
   padding: 0;
   font-weight: 600;
 }
@@ -2275,14 +2313,14 @@ fieldset:disabled .boton {
 .radios-en-linea {
   display: flex;
   flex-wrap: wrap;
-  gap: 0 24px;
+  gap: 0 var(--espacio-6);
 }
 
 .campo .radio {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  min-height: 44px;
+  gap: var(--espacio-2);
+  min-height: var(--alto-control);
   font-weight: 500;
   cursor: pointer;
 }
@@ -2296,23 +2334,23 @@ fieldset:disabled .boton {
 }
 
 .chips-previa {
-  gap: 6px;
+  gap: var(--espacio-2);
 }
 
 .chips-previa li {
-  padding: 2px 10px;
+  padding: 2px var(--espacio-3);
   background: var(--superficie-2);
   font-size: 0.8125rem;
 }
 
 /* ---------- Reportes ---------- */
 .grilla-graficos {
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(var(--ancho-tarjeta), 100%), 1fr));
 }
 
 .grafico {
   margin: 0;
-  padding: 20px;
+  padding: var(--relleno-tarjeta);
 }
 
 .grafico-titulo {
@@ -2327,8 +2365,8 @@ fieldset:disabled .boton {
 
 .grafico-lista {
   display: grid;
-  gap: 12px;
-  margin-top: 16px;
+  gap: var(--espacio-3);
+  margin-top: var(--espacio-4);
 }
 
 /* Móvil: etiqueta y valor arriba, barra debajo. Desde 600 px: todo en una fila. */
@@ -2339,7 +2377,7 @@ fieldset:disabled .boton {
     'etiqueta valor'
     'pista pista';
   align-items: center;
-  gap: 4px 12px;
+  gap: var(--espacio-1) var(--espacio-3);
 }
 
 .grafico-etiqueta {
@@ -2378,8 +2416,8 @@ fieldset:disabled .boton {
 }
 
 .grafico-total {
-  margin-top: 14px;
-  padding-top: 10px;
+  margin-top: var(--espacio-4);
+  padding-top: var(--espacio-3);
   border-top: 1px solid var(--borde);
   color: var(--texto-suave);
   font-size: 0.875rem;
@@ -2387,6 +2425,11 @@ fieldset:disabled .boton {
 
 .tabla-reporte {
   min-width: 560px;
+}
+
+/* Encabezados largos («Horas reservadas») en dos líneas: la tabla entra en su columna desde 1024 px. */
+.tabla-reporte thead th {
+  white-space: normal;
 }
 
 .tabla .numero {
@@ -2418,7 +2461,7 @@ fieldset:disabled .boton {
 .celda-ocupacion {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--espacio-2);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -2446,14 +2489,14 @@ fieldset:disabled .boton {
 .grupo-ajustes {
   min-width: 0;
   margin: 0;
-  padding: 20px;
+  padding: var(--relleno-tarjeta);
 }
 
 /* El legend flota para quedar dentro del borde de la tarjeta. */
 .grupo-ajustes legend {
   float: left;
   width: 100%;
-  margin-bottom: 4px;
+  margin-bottom: var(--espacio-1);
   padding: 0;
   font-size: 1.125rem;
   font-weight: 650;
@@ -2461,7 +2504,7 @@ fieldset:disabled .boton {
 
 .grupo-ajustes-texto {
   clear: both;
-  margin-bottom: 16px;
+  margin-bottom: var(--espacio-4);
   color: var(--texto-suave);
   font-size: 0.9375rem;
 }
@@ -2469,7 +2512,7 @@ fieldset:disabled .boton {
 .campo-unidad {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--espacio-3);
 }
 
 .campo-unidad input {
@@ -2482,14 +2525,14 @@ fieldset:disabled .boton {
 }
 
 .configuracion-resumen {
-  padding: 14px 16px;
+  padding: var(--espacio-4) var(--espacio-4);
   border-left: 4px solid var(--primario);
   border-radius: var(--radio);
   background: var(--primario-suave);
 }
 
 .configuracion-resumen-titulo {
-  margin-bottom: 4px;
+  margin-bottom: var(--espacio-1);
   font-size: 1rem;
 }
 
@@ -2507,7 +2550,7 @@ fieldset:disabled .boton {
 
 @media (min-width: 768px) {
   .carrusel-diapositiva {
-    padding: 36px 40px 20px;
+    padding: var(--espacio-7) var(--espacio-8) var(--espacio-5);
   }
 
   .carrusel-titulo {
@@ -2516,23 +2559,24 @@ fieldset:disabled .boton {
 
   .carrusel-ilustracion {
     display: block;
-    margin: 24px 24px 0 0;
+    margin: var(--espacio-6) var(--espacio-6) 0 0;
   }
 
   .carrusel-controles {
-    padding: 0 24px 18px 30px;
+    padding: 0 var(--espacio-3) var(--espacio-5) calc(var(--espacio-8) - (var(--alto-control) - 22px) / 2);
   }
 
   /* Menú lateral: columna a la izquierda. */
   .panel {
     grid-template-columns: 210px minmax(0, 1fr);
-    gap: 28px;
+    gap: var(--espacio-6);
     align-items: start;
   }
 
+  /* El título y la nota del menú comparten el borde izquierdo con las migas de pan y la tarjeta del menú. */
   .menu-lateral-titulo {
     display: block;
-    padding: 0 12px 8px;
+    padding: 0 0 var(--espacio-2);
     color: var(--texto-suave);
     font-size: 0.75rem;
     font-weight: 650;
@@ -2543,7 +2587,7 @@ fieldset:disabled .boton {
   .menu-lateral ul {
     flex-direction: column;
     gap: 2px;
-    padding: 8px;
+    padding: var(--espacio-2);
     overflow: visible;
   }
 
@@ -2552,7 +2596,7 @@ fieldset:disabled .boton {
   }
 
   .menu-lateral-nota {
-    padding: 0 12px;
+    padding: 0;
   }
 }
 
@@ -2585,5 +2629,144 @@ fieldset:disabled .boton {
 
   .menu-lateral a[aria-current='page'] {
     outline: 2px solid CanvasText;
+  }
+}
+
+/* ==========================================================================
+   Diseño responsivo: tablas como tarjetas apiladas (por debajo de 600 px)
+   ========================================================================== */
+
+/* Las tablas (horario, búsqueda, reservas y laboratorios del panel, reportes) no caben a 375 px.
+   Por debajo de 600 px cada fila se muestra como una tarjeta: cada celda lleva su rótulo
+   (data-etiqueta, el mismo texto del encabezado) y las acciones por fila quedan al pie.
+   Desde 600 px vuelve la tabla real. Los roles ARIA explícitos (role="table", "row", "cell"…)
+   conservan la semántica de tabla para los lectores de pantalla aunque cambie el display. */
+@media (max-width: 599px) {
+  .tabla-contenedor {
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .tabla,
+  .tabla-reporte {
+    min-width: 0;
+  }
+
+  .tabla thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+
+  .tabla,
+  .tabla tbody,
+  .tabla tfoot,
+  .tabla tr {
+    display: block;
+  }
+
+  .tabla tbody,
+  .tabla tfoot {
+    display: grid;
+    gap: var(--espacio-3);
+  }
+
+  .tabla tfoot {
+    margin-top: var(--espacio-3);
+  }
+
+  .tabla tr {
+    padding: var(--espacio-2) var(--relleno-tarjeta);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-grande);
+    background: var(--superficie);
+    box-shadow: var(--sombra);
+  }
+
+  .tabla tfoot tr {
+    background: var(--superficie-2);
+  }
+
+  /* Cada celda: rótulo a la izquierda y dato a la derecha, en la misma fila (Proximidad). */
+  .tabla td,
+  .tabla tbody th,
+  .tabla tfoot th {
+    display: grid;
+    grid-template-columns: minmax(6.5rem, 40%) minmax(0, 1fr);
+    align-items: baseline;
+    justify-items: start;
+    gap: var(--espacio-3);
+    padding: var(--espacio-2) 0;
+    border: 0;
+    background: transparent;
+    text-align: left;
+  }
+
+  .tabla tbody tr + tr td,
+  .tabla tbody tr + tr th,
+  .tabla tfoot th,
+  .tabla tfoot td {
+    border-top: 0;
+  }
+
+  .tabla td + td,
+  .tabla th + td {
+    border-top: 1px solid var(--borde);
+  }
+
+  .tabla td::before,
+  .tabla tbody th::before,
+  .tabla tfoot th::before {
+    content: attr(data-etiqueta);
+    color: var(--texto-suave);
+    font-size: 0.8125rem;
+    font-weight: 650;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  .tabla .numero {
+    text-align: left;
+  }
+
+  .celda-motivo {
+    min-width: 0;
+    max-width: none;
+  }
+
+  /* Acciones por fila: sin rótulo, al pie de la tarjeta y con todo el ancho para tocarlas. */
+  .tabla .celda-acciones {
+    display: block;
+    justify-items: stretch;
+    padding-top: var(--espacio-3);
+    padding-bottom: var(--espacio-2);
+  }
+
+  .tabla .celda-acciones::before {
+    content: none;
+  }
+
+  .tabla .acciones-fila {
+    margin-block: 0;
+  }
+
+  .tabla .acciones-fila .boton-fila {
+    flex: 1 1 0;
+  }
+
+  /* Pestañas a 320 px: las tres entran sin desplazar la barra. */
+  .pestanas-lista [role='tab'] {
+    padding-inline: var(--espacio-3);
+  }
+}
+
+@media (max-width: 359px) {
+  .pestanas-lista [role='tab'] {
+    padding-inline: var(--espacio-2);
   }
 }

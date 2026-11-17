@@ -3,7 +3,8 @@
  * Problema que resuelve: para planificar el semestre el encargado necesita respuestas resumidas
  * («¿qué tipo de reserva se pide más?», «¿qué lab se reserva más?», «¿qué día está más lleno?»)
  * y no una lista de registros. Dos gráficos de barras horizontales accesibles (GraficoBarras.jsx)
- * y una tabla de ocupación por día de la semana con su fila de totales. Todo se calcula en el
+ * y una tabla de ocupación por día de la semana con su fila de totales (por debajo de 600 px,
+ * cada día se muestra como una tarjeta con el rótulo de cada dato). Todo se calcula en el
  * navegador con los datos cargados (src/estadisticas.js) y se indica cuándo se generó.
  */
 import GraficoBarras from '../components/GraficoBarras.jsx';
@@ -72,27 +73,27 @@ export default function PanelReportes({ refTitulo, cargando, laboratorios, clase
               <strong>{diaMasOcupado?.nombre.toLowerCase()}</strong> ({diaMasOcupado?.porcentaje} %).
             </p>
             <div className="tabla-contenedor" role="region" aria-labelledby="titulo-por-dia" tabIndex={0}>
-              <table className="tabla tabla-reporte">
+              <table className="tabla tabla-reporte" role="table">
                 <caption className="solo-lectores">Ocupación por día de la semana, de lunes a sábado, con totales</caption>
-                <thead>
-                  <tr>
-                    <th scope="col">Día</th>
-                    <th scope="col" className="numero">Clases</th>
-                    <th scope="col" className="numero">Horas de clase</th>
-                    <th scope="col" className="numero">Reservas</th>
-                    <th scope="col" className="numero">Horas reservadas</th>
-                    <th scope="col">Ocupación</th>
+                <thead role="rowgroup">
+                  <tr role="row">
+                    <th scope="col" role="columnheader">Día</th>
+                    <th scope="col" role="columnheader" className="numero">Clases</th>
+                    <th scope="col" role="columnheader" className="numero">Horas de clase</th>
+                    <th scope="col" role="columnheader" className="numero">Reservas</th>
+                    <th scope="col" role="columnheader" className="numero">Horas reservadas</th>
+                    <th scope="col" role="columnheader">Ocupación</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody role="rowgroup">
                   {porDia.map((fila) => (
-                    <tr key={fila.dia}>
-                      <th scope="row">{fila.nombre}</th>
-                      <td className="numero">{fila.clases}</td>
-                      <td className="numero">{formatearHoras(fila.horasClase)}</td>
-                      <td className="numero">{fila.reservas}</td>
-                      <td className="numero">{formatearHoras(fila.horasReserva)}</td>
-                      <td>
+                    <tr key={fila.dia} role="row">
+                      <th scope="row" role="rowheader" data-etiqueta="Día">{fila.nombre}</th>
+                      <td role="cell" data-etiqueta="Clases" className="numero">{fila.clases}</td>
+                      <td role="cell" data-etiqueta="Horas de clase" className="numero">{formatearHoras(fila.horasClase)}</td>
+                      <td role="cell" data-etiqueta="Reservas" className="numero">{fila.reservas}</td>
+                      <td role="cell" data-etiqueta="Horas reservadas" className="numero">{formatearHoras(fila.horasReserva)}</td>
+                      <td role="cell" data-etiqueta="Ocupación">
                         <span className="celda-ocupacion">
                           <span className="celda-ocupacion-pista" aria-hidden="true">
                             <span style={{ width: `${fila.porcentaje}%` }} />
@@ -103,14 +104,14 @@ export default function PanelReportes({ refTitulo, cargando, laboratorios, clase
                     </tr>
                   ))}
                 </tbody>
-                <tfoot>
-                  <tr>
-                    <th scope="row">Semana</th>
-                    <td className="numero">{totales.clases}</td>
-                    <td className="numero">{formatearHoras(totales.horasClase)}</td>
-                    <td className="numero">{totales.reservas}</td>
-                    <td className="numero">{formatearHoras(totales.horasReserva)}</td>
-                    <td>{porcentajeTotal} %</td>
+                <tfoot role="rowgroup">
+                  <tr role="row">
+                    <th scope="row" role="rowheader" data-etiqueta="Total">Semana</th>
+                    <td role="cell" data-etiqueta="Clases" className="numero">{totales.clases}</td>
+                    <td role="cell" data-etiqueta="Horas de clase" className="numero">{formatearHoras(totales.horasClase)}</td>
+                    <td role="cell" data-etiqueta="Reservas" className="numero">{totales.reservas}</td>
+                    <td role="cell" data-etiqueta="Horas reservadas" className="numero">{formatearHoras(totales.horasReserva)}</td>
+                    <td role="cell" data-etiqueta="Ocupación">{porcentajeTotal} %</td>
                   </tr>
                 </tfoot>
               </table>

@@ -4,8 +4,10 @@
  * abruma y obliga a hacer mucho scroll. Se muestran 5 filas por página con «Anterior»,
  * «Siguiente» y los números de página; el texto «Mostrando 1–5 de 8» dice en qué parte de la
  * lista estás. Los botones en los extremos usan aria-disabled para que el foco no se pierda.
- * La tabla usa encabezados th scope="col" y un caption para lectores de pantalla, y en pantallas
- * angostas se desplaza dentro de su propio marco (región enfocable) sin mover la página.
+ * La tabla usa encabezados th scope="col" y un caption para lectores de pantalla. Por debajo de
+ * 600 px cada fila se muestra como una tarjeta apilada: cada celda lleva su rótulo (data-etiqueta)
+ * y las acciones quedan al pie. Los roles ARIA explícitos conservan la semántica de tabla aunque
+ * el CSS cambie el display; entre 600 px y el ancho natural de la tabla, se desplaza en su marco.
  */
 import { useState } from 'react';
 
@@ -25,24 +27,31 @@ export default function TablaPaginada({ titulo, columnas, filas, porPagina = 5 }
   return (
     <div className="tabla-paginada">
       <div className="tabla-contenedor" role="region" aria-label={titulo} tabIndex={0}>
-        <table className="tabla">
+        <table className="tabla" role="table">
           <caption className="solo-lectores">
             {titulo}, página {paginaActual} de {totalPaginas}
           </caption>
-          <thead>
-            <tr>
+          <thead role="rowgroup">
+            <tr role="row">
               {columnas.map((columna) => (
-                <th key={columna.clave} scope="col">
+                <th key={columna.clave} scope="col" role="columnheader">
                   {columna.titulo}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody>
+          <tbody role="rowgroup">
             {visibles.map((fila) => (
-              <tr key={fila.id}>
+              <tr key={fila.id} role="row">
                 {columnas.map((columna) => (
-                  <td key={columna.clave}>{columna.render ? columna.render(fila) : fila[columna.clave]}</td>
+                  <td
+                    key={columna.clave}
+                    role="cell"
+                    data-etiqueta={columna.titulo}
+                    className={columna.clave === 'acciones' ? 'celda-acciones' : undefined}
+                  >
+                    {columna.render ? columna.render(fila) : fila[columna.clave]}
+                  </td>
                 ))}
               </tr>
             ))}

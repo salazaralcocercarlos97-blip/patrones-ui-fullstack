@@ -100,6 +100,34 @@ con `Escape`), **migas de pan** (`Breadcrumbs.jsx`), **acordeón** (`Accordion.j
 (`EmptyState.jsx`: busca `química` o elige Mantenimiento + 44 PCs o más), **aviso de conexión** (`AvisoConexion.jsx`,
 con el servidor apagado) y **modo claro/oscuro** (`Header.jsx` + `styles.css`, se recuerda en `localStorage`).
 
+## Principios de diseño CRAP
+
+La interfaz sigue los cuatro principios de Robin Williams (*The non-designer's design book*, 2015). Casi todo vive en
+variables de `src/styles.css`, así que el mismo criterio se aplica en todas las vistas, también en el panel.
+
+| Principio | Cómo se aplica |
+|---|---|
+| **Contraste** | Jerarquía de títulos (`h1` 2rem/700, `h2` 1.25rem, texto secundario en `--texto-suave`). Tres pesos de botón: primario relleno (`.boton-primario`), secundario con borde (`.boton-secundario`) y destructivo en rojo (`.boton-peligro`, como «Cancelar reserva» frente a «Volver»). Errores en rojo con ícono bajo el campo; insignias con color **y** texto. Contraste AA en el tema claro y en el oscuro. |
+| **Repetición** | Una sola escala de espaciado (`--espacio-1` a `--espacio-8`: 4, 8, 12, 16, 20, 24, 32 y 48 px), un solo relleno de tarjeta (`--relleno-tarjeta`), un solo alto de control (`--alto-control`, 44 px) y los mismos radios, sombras y colores en tarjetas de laboratorio, KPI, gráficos, bloques del panel y grupos de configuración. La cabecera es la misma en todas las vistas. |
+| **Alineación** | Un contenedor de 1200 px con un borde izquierdo común (migas, título, filtros, tarjetas). Los 6 laboratorios quedan en una cuadrícula de 3 × 2 en escritorio (mínimo 280 px por columna). En el panel, el título del menú lateral comparte el borde de las migas y el contenido empieza en una columna fija. Los puntos del carrusel quedan alineados con su texto. |
+| **Proximidad** | Cada etiqueta está a 8 px de su campo y el error justo debajo; los campos se separan 20 px y los grupos (tarjetas) más; entre secciones hay `--espacio-seccion` (32 px), más que dentro de ellas. Los datos de cada laboratorio, reserva o KPI están agrupados en su tarjeta. |
+
+## Diseño responsivo
+
+Probado de **320 a 1440 px** de ancho, en tema claro y oscuro, sin desplazamiento horizontal de la página. Todo lo que
+se toca mide al menos **44 × 44 px** (botones, enlaces de la cabecera y de las migas, filtros, puntos del carrusel,
+acciones por fila) y las ventanas modales caben en la pantalla incluso a 375 × 568 (si el contenido es largo, se
+desplazan por dentro).
+
+| Punto de quiebre | Qué cambia |
+|---|---|
+| **< 600 px** | Las tablas (horario, búsqueda, reservas y laboratorios del panel, reportes) se muestran como **tarjetas apiladas**: cada dato con su rótulo y las acciones por fila al pie, a todo el ancho. Los campos del formulario van en una columna. |
+| **< 360 px** | Las pestañas del detalle se compactan para que entren las tres. |
+| **≥ 600 px** | Vuelve la tabla real (si es más ancha que su columna, se desplaza dentro de su marco, sin mover la página); campos en dos columnas; barras de los reportes en una fila. |
+| **≥ 768 px** | La cabecera muestra los enlaces (sin menú hamburguesa); el menú lateral del panel pasa a una columna a la izquierda; el carrusel muestra su ilustración. Entre 768 y 999 px la marca muestra solo el logo. |
+| **≥ 1000 px** | El detalle del laboratorio usa dos columnas (información y software). |
+| **≥ 1100 px** | La búsqueda entra en la misma fila que la navegación; el panel de control usa dos columnas (ocupación y próximas reservas). |
+
 ## Estructura
 
 ```

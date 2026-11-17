@@ -3,7 +3,7 @@
  * Problema que resuelve: el encargado necesita ver TODAS las reservas a la vez, ordenadas por
  * fecha y con las mismas columnas (Lab, Fecha, Horario, Tipo, Motivo), para compararlas y
  * actuar sobre una sin buscarla. La tabla usa encabezados reales (th scope="col"), un caption
- * para lectores de pantalla, se desplaza dentro de su propio marco en pantallas angostas y se
+ * para lectores de pantalla, por debajo de 600 px se muestra como tarjetas apiladas y se
  * divide en páginas de 5 filas (TablaPaginada.jsx).
  * En la última columna, «Ver» abre una ventana modal informativa con un solo botón («Cerrar»)
  * y «Cancelar» abre la confirmación de siempre. Cada botón tiene un aria-label con su fila.
