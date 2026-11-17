@@ -1,9 +1,10 @@
 /*
- * Patrón: TOAST (notificación breve).
+ * Patrón: NOTIFICACIÓN TOAST (notificación breve).
  * Problema que resuelve: confirmar que una acción funcionó («Reserva registrada»,
- * «Reserva cancelada») sin bloquear al usuario ni pedirle que cierre nada.
- * Se oculta solo a los 3 s. La región role="status" existe siempre en la página para
- * que los lectores de pantalla anuncien el mensaje en cuanto aparece.
+ * «Laboratorio creado», «Configuración guardada») sin bloquear al usuario ni pedirle que
+ * cierre nada. Se oculta solo a los 3 s (6 s si es un error, para que dé tiempo a leerlo).
+ * La región role="status" existe siempre en la página para que los lectores de pantalla
+ * anuncien el mensaje en cuanto aparece.
  */
 import { useEffect, useRef } from 'react';
 

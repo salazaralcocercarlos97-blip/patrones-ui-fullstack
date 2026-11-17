@@ -1,10 +1,13 @@
 /*
- * App: une los 16 patrones UI (6 categorías). Versión con backend (Express + SQLite).
- * - Al iniciar pide laboratorios, clases y reservas a la API (src/api.js). Mientras tanto
- *   se ve el skeleton (mínimo 1 s, para que se note en la demo).
+ * App: une los 21 patrones UI del informe (6 categorías) y los demás patrones de la demo.
+ * Versión con backend (Express + SQLite).
+ * - Al iniciar pide laboratorios, clases, reservas y configuración a la API (src/api.js).
+ *   Mientras tanto se ve el skeleton (mínimo 1 s, para que se note en la demo).
  * - MODO DE RESPALDO: si el servidor no responde, usa los datos de src/data.js y guarda
  *   las reservas en localStorage (dentro de try/catch). Un aviso lo explica y ofrece «Reintentar».
- * - Navegación por hash (#/laboratorios/236-43) para que funcionen Atrás/Adelante del navegador.
+ *   En ese modo, el CRUD de laboratorios y la configuración del panel quedan en solo lectura.
+ * - Navegación por hash (#/laboratorios/236-43, #/panel/reportes) para que funcionen
+ *   Atrás/Adelante del navegador.
  * - Al cambiar de página, el foco va al título (h1) para que el lector de pantalla lo anuncie.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -20,19 +23,32 @@ import EmptyState from './components/EmptyState.jsx';
 import Skeleton from './components/Skeleton.jsx';
 import Accordion from './components/Accordion.jsx';
 import AvisoConexion from './components/AvisoConexion.jsx';
-import { cancelarReserva, crearReserva, obtenerDatos } from './api.js';
+import Carrusel from './components/Carrusel.jsx';
+import Filtros, { FILTROS_INICIALES, OPCIONES_CAPACIDAD, OPCIONES_ESTADO, cumpleFiltros, hayFiltrosActivos } from './components/Filtros.jsx';
+import BotonConCarga from './components/IndicadorCarga.jsx';
+import { SECCIONES_PANEL } from './components/MenuLateral.jsx';
+import PanelEncargado from './vistas/PanelEncargado.jsx';
 import {
+  actualizarLaboratorio,
+  cancelarReserva,
+  crearLaboratorio,
+  crearReserva,
+  eliminarLaboratorio,
+  guardarConfiguracion,
+  obtenerDatos,
+} from './api.js';
+import {
+  CONFIGURACION_POR_DEFECTO,
   DIAS,
-  HORA_APERTURA,
-  HORA_CIERRE,
   SEMESTRE,
   TIPOS_RESERVA,
   clases as clasesLocales,
+  crearPreguntasFrecuentes,
   formatearFecha,
   laboratorios as laboratoriosLocales,
-  preguntasFrecuentes,
   reservasDeEjemplo,
 } from './data.js';
+import { normalizarConfiguracion, normalizarLaboratorio } from './reglasPanel.js';
 
 const CLAVE_TEMA = 'patrones-ui:tema';
 const CLAVE_RESERVAS = 'patrones-ui:reservas';
@@ -54,11 +70,15 @@ function leerRuta() {
   }
   if (partes[0] === 'reservas') return { vista: 'reservas' };
   if (partes[0] === 'ayuda') return { vista: 'ayuda' };
+  if (partes[0] === 'panel') {
+    const seccion = partes[1] ?? 'inicio';
+    if (SECCIONES_PANEL.some((item) => item.id === seccion)) return { vista: 'panel', seccion };
+  }
   return { vista: 'no-encontrada' };
 }
 
 function claveDeRuta(ruta) {
-  return [ruta.vista, ruta.codigo, ruta.pestana].filter(Boolean).join('/');
+  return [ruta.vista, ruta.codigo, ruta.pestana, ruta.seccion].filter(Boolean).join('/');
 }
 
 // Minúsculas y sin tildes, para que «programacion» encuentre «Programación».
@@ -151,29 +171,89 @@ const COLUMNAS_BUSQUEDA = [
   },
 ];
 
-// Catálogo de los 16 patrones, agrupados en 6 categorías según el problema que resuelven.
-const PATRONES = [
-  { numero: 1, categoria: 'Navegación', nombre: 'Menú hamburguesa', descripcion: 'Agrupa la navegación en pantallas de menos de 768 px. Se cierra con Escape.', donde: 'En la cabecera, en móvil' },
-  { numero: 2, categoria: 'Navegación', nombre: 'Migas de pan', descripcion: 'Muestran dónde estás y te llevan de vuelta en un clic.', donde: 'Ir al Lab 236-43', href: '#/laboratorios/236-43' },
-  { numero: 3, categoria: 'Navegación', nombre: 'Pestañas', descripcion: 'Separan Información, Horario y Reservar. Se recorren con las flechas.', donde: 'Ir al Lab 236-43', href: '#/laboratorios/236-43' },
-  { numero: 4, categoria: 'Navegación', nombre: 'Paginación', descripcion: 'Divide el horario del laboratorio en páginas de 5 filas.', donde: 'Horario del Lab 236-41', href: '#/laboratorios/236-41/horario' },
-  { numero: 5, categoria: 'Navegación', nombre: 'Estado activo', descripcion: 'El menú resalta la sección en la que estás (aria-current).', donde: 'En el menú de la cabecera' },
-  { numero: 6, categoria: 'Búsqueda', nombre: 'Búsqueda global', descripcion: 'Filtra laboratorios y materias mientras escribes.', donde: 'En la cabecera (atajo: tecla /)' },
-  { numero: 7, categoria: 'Entrada de datos', nombre: 'Validación en línea', descripcion: 'Revisa cada campo al salir de él; el servidor vuelve a validar al guardar.', donde: 'Reservar el Lab 236-44', href: '#/laboratorios/236-44/reservar' },
-  { numero: 8, categoria: 'Presentación', nombre: 'Tarjetas', descripcion: 'Resumen de cada laboratorio con su estado y una sola acción.', donde: 'Ir a Laboratorios', href: '#/laboratorios' },
-  { numero: 9, categoria: 'Presentación', nombre: 'Acordeón', descripcion: 'Preguntas frecuentes con un solo panel abierto a la vez.', donde: 'Ir a Ayuda', href: '#/ayuda' },
-  { numero: 10, categoria: 'Presentación', nombre: 'Insignias de estado', descripcion: 'Etiquetas «Disponible / Mantenimiento» y contador de reservas: el estado de un vistazo.', donde: 'Ir a Laboratorios', href: '#/laboratorios' },
-  { numero: 11, categoria: 'Retroalimentación', nombre: 'Toast', descripcion: 'Avisa «Reserva registrada» o «Reserva cancelada» y se oculta a los 3 s.', donde: 'Al registrar o cancelar una reserva' },
-  { numero: 12, categoria: 'Retroalimentación', nombre: 'Skeleton de carga', descripcion: 'Dibuja la forma del contenido mientras llegan los datos del servidor.', donde: 'Ir a Laboratorios («Recargar»)', href: '#/laboratorios' },
-  { numero: 13, categoria: 'Retroalimentación', nombre: 'Estado vacío', descripcion: 'Explica que no hubo resultados y ofrece «Limpiar búsqueda».', donde: 'Probar búsqueda sin resultados', accion: 'vacio' },
-  { numero: 14, categoria: 'Retroalimentación', nombre: 'Modal de confirmación', descripcion: 'Pide confirmación antes de cancelar una reserva.', donde: 'Ir a Mis reservas', href: '#/reservas' },
-  { numero: 15, categoria: 'Retroalimentación', nombre: 'Aviso de conexión', descripcion: 'Si el servidor no responde, lo explica, usa datos locales y ofrece «Reintentar».', donde: 'Aparece con el servidor apagado' },
-  { numero: 16, categoria: 'Personalización', nombre: 'Modo claro/oscuro', descripcion: 'Cambia el tema con variables CSS y recuerda tu elección.', donde: 'Botón de luna/sol en la cabecera' },
-];
-
 // ---------- Vistas ----------
 
-function VistaInicio({ refTitulo, cargando, laboratorios, clases, totalReservas, onProbarVacio }) {
+// Diapositivas del carrusel de Inicio, armadas con los datos reales del sistema.
+function crearDiapositivas(laboratorios, configuracion) {
+  const { horaApertura, horaCierre, duracionMaximaHoras, anticipacionMaximaDias } = configuracion;
+  const enMantenimiento = laboratorios.filter((lab) => lab.estado === 'MANTENIMIENTO');
+
+  let mantenimiento;
+  if (enMantenimiento.length === 1) {
+    const [lab] = enMantenimiento;
+    mantenimiento = {
+      id: 'mantenimiento',
+      icono: 'herramienta',
+      etiqueta: 'Aviso',
+      titulo: `Lab ${lab.codigo} en mantenimiento`,
+      texto: `${lab.motivoMantenimiento ? `${lab.motivoMantenimiento} ` : ''}Mientras tanto no recibe reservas: elige otro laboratorio del piso.`,
+      accion: { etiqueta: `Ver el Lab ${lab.codigo}`, href: `#/laboratorios/${lab.codigo}` },
+    };
+  } else if (enMantenimiento.length > 1) {
+    mantenimiento = {
+      id: 'mantenimiento',
+      icono: 'herramienta',
+      etiqueta: 'Aviso',
+      titulo: `${enMantenimiento.length} laboratorios en mantenimiento`,
+      texto: `Los labs ${enMantenimiento.map((lab) => lab.codigo).join(', ')} no reciben reservas por ahora. Elige otro laboratorio del piso.`,
+      accion: { etiqueta: 'Ver laboratorios', href: '#/laboratorios' },
+    };
+  } else {
+    mantenimiento = {
+      id: 'mantenimiento',
+      icono: 'herramienta',
+      etiqueta: 'Estado del piso',
+      titulo: `Los ${laboratorios.length} laboratorios están disponibles`,
+      texto: 'Ningún laboratorio está en mantenimiento: todos reciben reservas.',
+      accion: { etiqueta: 'Ver laboratorios', href: '#/laboratorios' },
+    };
+  }
+
+  // Programas ordenados por cuántos laboratorios los tienen.
+  const conteo = new Map();
+  laboratorios.forEach((lab) => lab.software.forEach((nombre) => conteo.set(nombre, (conteo.get(nombre) || 0) + 1)));
+  const programas = [...conteo.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'es'));
+  const [primero] = programas;
+  const otros = programas.slice(1, 4).map(([nombre]) => nombre);
+  const textoSoftware =
+    primero && primero[1] === laboratorios.length && otros.length > 0
+      ? `${primero[0]} está en los ${laboratorios.length} laboratorios; también hay ${otros.join(', ')} y más. Revisa la pestaña Información de cada lab antes de reservar.`
+      : `Entre ellos, ${programas
+          .slice(0, 4)
+          .map(([nombre]) => nombre)
+          .join(', ')}. Revisa la pestaña Información de cada lab antes de reservar.`;
+
+  return [
+    {
+      id: 'reservas',
+      icono: 'calendario',
+      etiqueta: `Semestre ${SEMESTRE}`,
+      titulo: `Reserva tu laboratorio para el semestre ${SEMESTRE}`,
+      texto:
+        'Exámenes, prácticas, recuperatorios y eventos: elige un laboratorio disponible, revisa su horario y regístralo en un minuto.',
+      accion: { etiqueta: 'Ver laboratorios', href: '#/laboratorios' },
+    },
+    mantenimiento,
+    {
+      id: 'horario',
+      icono: 'reloj',
+      etiqueta: 'Horario de atención',
+      titulo: `Lunes a sábado, de ${horaApertura} a ${horaCierre}`,
+      texto: `Cada reserva puede durar hasta ${duracionMaximaHoras} h y se registra con hasta ${anticipacionMaximaDias} ${Number(anticipacionMaximaDias) === 1 ? 'día' : 'días'} de anticipación. Los domingos los laboratorios están cerrados.`,
+      accion: { etiqueta: 'Ver preguntas frecuentes', href: '#/ayuda' },
+    },
+    {
+      id: 'software',
+      icono: 'monitor',
+      etiqueta: 'Software disponible',
+      titulo: `${programas.length} programas instalados en el piso`,
+      texto: textoSoftware,
+      accion: { etiqueta: 'Comparar laboratorios', href: '#/laboratorios' },
+    },
+  ];
+}
+
+function VistaInicio({ refTitulo, cargando, laboratorios, clases, totalReservas, configuracion }) {
   const disponibles = laboratorios.filter((lab) => lab.estado === 'DISPONIBLE').length;
   const totalPCs = laboratorios.reduce((suma, lab) => suma + lab.capacidad, 0);
 
@@ -185,7 +265,7 @@ function VistaInicio({ refTitulo, cargando, laboratorios, clases, totalReservas,
           Laboratorios del 4to piso
         </h1>
         <p className="portada-texto">
-          Consulta los seis laboratorios de computación del módulo 236, revisa sus horarios y reserva un espacio para tu
+          Consulta los laboratorios de computación del módulo 236, revisa sus horarios y reserva un espacio para tu
           examen, práctica o evento.
         </p>
         <div className="acciones">
@@ -197,6 +277,12 @@ function VistaInicio({ refTitulo, cargando, laboratorios, clases, totalReservas,
           </a>
         </div>
       </section>
+
+      {cargando ? (
+        <Skeleton variante="carrusel" texto="Cargando destacados…" />
+      ) : (
+        <Carrusel etiqueta="Destacados" diapositivas={crearDiapositivas(laboratorios, configuracion)} />
+      )}
 
       <section className="seccion" aria-label="Resumen">
         {cargando ? (
@@ -224,41 +310,18 @@ function VistaInicio({ refTitulo, cargando, laboratorios, clases, totalReservas,
           </ul>
         )}
       </section>
-
-      <section className="seccion" aria-labelledby="titulo-patrones">
-        <h2 id="titulo-patrones" className="subtitulo">
-          Los 16 patrones de esta demo
-        </h2>
-        <p className="seccion-intro">
-          16 patrones en 6 categorías: navegación, búsqueda, entrada de datos, presentación, retroalimentación y
-          personalización. Cada uno resuelve un problema concreto de uso.
-        </p>
-        <ol className="lista-patrones">
-          {PATRONES.map((patron) => (
-            <li key={patron.numero} className="patron">
-              <span className="patron-numero" aria-hidden="true">
-                {patron.numero}
-              </span>
-              <div>
-                <p className="patron-categoria">{patron.categoria}</p>
-                <h3 className="patron-nombre">{patron.nombre}</h3>
-                <p className="patron-descripcion">{patron.descripcion}</p>
-                <p className="patron-donde">
-                  {patron.href && <a href={patron.href}>{patron.donde}</a>}
-                  {patron.accion === 'vacio' && (
-                    <button type="button" className="boton-enlace" onClick={onProbarVacio}>
-                      {patron.donde}
-                    </button>
-                  )}
-                  {!patron.href && !patron.accion && patron.donde}
-                </p>
-              </div>
-            </li>
-          ))}
-        </ol>
-      </section>
     </>
   );
+}
+
+// Texto de los filtros elegidos, para el estado vacío («estado «Mantenimiento» y capacidad de 44 PCs o más»).
+function describirFiltros(filtros) {
+  const partes = [];
+  if (filtros.estado !== FILTROS_INICIALES.estado)
+    partes.push(`estado «${OPCIONES_ESTADO.find((o) => o.valor === filtros.estado)?.etiqueta}»`);
+  if (filtros.capacidadMinima !== FILTROS_INICIALES.capacidadMinima)
+    partes.push(`capacidad de ${OPCIONES_CAPACIDAD.find((o) => o.valor === filtros.capacidadMinima)?.etiqueta}`);
+  return partes.join(' y ');
 }
 
 function VistaLaboratorios({
@@ -268,18 +331,29 @@ function VistaLaboratorios({
   busqueda,
   labsEncontrados,
   clasesEncontradas,
+  totalLabs,
   totalClasesPorLab,
+  filtros,
+  onCambiarFiltros,
+  onLimpiarFiltros,
   onLimpiar,
 }) {
   const termino = busqueda.trim();
   const hayBusqueda = termino !== '';
-  const sinResultados = hayBusqueda && labsEncontrados.length === 0 && clasesEncontradas.length === 0;
+  const filtrando = hayFiltrosActivos(filtros);
+  const sinResultados = labsEncontrados.length === 0 && clasesEncontradas.length === 0;
+  const conFiltros = filtrando ? ', con los filtros elegidos' : '';
 
+  // Cantidad de resultados, anunciada en una región role="status" (patrones Búsqueda y Filtrado).
   let resumen = '';
-  if (hayBusqueda && !cargando) {
-    resumen = sinResultados
-      ? `Sin resultados para «${termino}».`
-      : `${plural(labsEncontrados.length, 'laboratorio', 'laboratorios')} y ${plural(clasesEncontradas.length, 'clase', 'clases')} para «${termino}».`;
+  if (!cargando) {
+    if (hayBusqueda) {
+      resumen = sinResultados
+        ? `Sin resultados para «${termino}»${conFiltros}.`
+        : `${plural(labsEncontrados.length, 'laboratorio', 'laboratorios')} y ${plural(clasesEncontradas.length, 'clase', 'clases')} para «${termino}»${conFiltros}.`;
+    } else {
+      resumen = `Mostrando ${labsEncontrados.length} de ${plural(totalLabs, 'laboratorio', 'laboratorios')}.`;
+    }
   }
 
   return (
@@ -289,15 +363,25 @@ function VistaLaboratorios({
           <h1 ref={refTitulo} tabIndex={-1}>
             Laboratorios
           </h1>
-          <p className="titulo-sub">Seis laboratorios de computación del 4to piso, módulo 236.</p>
+          <p className="titulo-sub">Laboratorios de computación del 4to piso, módulo 236.</p>
         </div>
-        <button type="button" className="boton boton-secundario" onClick={onRecargar}>
-          <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7" />
-          </svg>
-          Recargar
-        </button>
+        <BotonConCarga
+          className="boton boton-secundario"
+          cargando={cargando}
+          textoCargando="Cargando…"
+          onClick={onRecargar}
+          texto={
+            <>
+              <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7" />
+              </svg>
+              Recargar
+            </>
+          }
+        />
       </div>
+
+      <Filtros filtros={filtros} onCambiar={onCambiarFiltros} onLimpiar={onLimpiarFiltros} />
 
       <p className="resultado-resumen" role="status">
         {resumen}
@@ -305,12 +389,21 @@ function VistaLaboratorios({
 
       {cargando && <Skeleton variante="tarjetas" cantidad={6} texto="Cargando laboratorios…" />}
 
-      {!cargando && sinResultados && (
+      {!cargando && sinResultados && hayBusqueda && !filtrando && (
         <EmptyState
           icono="busqueda"
           titulo={`No encontramos nada para «${termino}»`}
           mensaje="Prueba con el código de un laboratorio (236-43), la sigla de una materia (INF120) o el apellido de un docente."
           accion={{ etiqueta: 'Limpiar búsqueda', onClick: onLimpiar }}
+        />
+      )}
+
+      {!cargando && sinResultados && filtrando && (
+        <EmptyState
+          icono="busqueda"
+          titulo="Ningún laboratorio cumple los filtros"
+          mensaje={`No hay laboratorios con ${describirFiltros(filtros)}${hayBusqueda ? ` para «${termino}»` : ''}. Prueba con otro estado o una capacidad menor.`}
+          accion={{ etiqueta: 'Limpiar filtros', onClick: onLimpiarFiltros }}
         />
       )}
 
@@ -350,7 +443,7 @@ function VistaLaboratorios({
   );
 }
 
-function VistaLaboratorio({ refTitulo, laboratorio, clases, pestanaInicial, cargando, reservas, onRegistrar }) {
+function VistaLaboratorio({ refTitulo, laboratorio, clases, pestanaInicial, cargando, reservas, configuracion, onRegistrar }) {
   const [pestana, setPestana] = useState(pestanaInicial);
   const clasesLab = useMemo(
     () => clases.filter((clase) => clase.lab === laboratorio.codigo).sort(ordenarClases),
@@ -386,7 +479,7 @@ function VistaLaboratorio({ refTitulo, laboratorio, clases, pestanaInicial, carg
           <div>
             <dt>Atención</dt>
             <dd>
-              Lunes a sábado, {HORA_APERTURA} a {HORA_CIERRE}
+              Lunes a sábado, {configuracion.horaApertura} a {configuracion.horaCierre}
             </dd>
           </div>
           <div>
@@ -443,7 +536,15 @@ function VistaLaboratorio({ refTitulo, laboratorio, clases, pestanaInicial, carg
             {
               id: 'reservar',
               etiqueta: 'Reservar',
-              contenido: <ReservaForm laboratorio={laboratorio} clases={clases} reservas={reservas} onRegistrar={onRegistrar} />,
+              contenido: (
+                <ReservaForm
+                  laboratorio={laboratorio}
+                  clases={clases}
+                  reservas={reservas}
+                  configuracion={configuracion}
+                  onRegistrar={onRegistrar}
+                />
+              ),
             },
           ]}
         />
@@ -532,7 +633,7 @@ function VistaReservas({ refTitulo, cargando, reservas, onPedirCancelacion }) {
   );
 }
 
-function VistaAyuda({ refTitulo }) {
+function VistaAyuda({ refTitulo, configuracion }) {
   return (
     <>
       <div className="titulo-pagina">
@@ -543,7 +644,7 @@ function VistaAyuda({ refTitulo }) {
           <p className="titulo-sub">Lo que necesitas saber antes de reservar un laboratorio.</p>
         </div>
       </div>
-      <Accordion items={preguntasFrecuentes} nivelTitulo={2} />
+      <Accordion items={crearPreguntasFrecuentes(configuracion)} nivelTitulo={2} />
       <p className="nota">¿No encontraste tu respuesta? Consulta con el encargado de laboratorios del 4to piso.</p>
     </>
   );
@@ -565,11 +666,13 @@ function VistaNoEncontrada({ refTitulo, titulo, mensaje }) {
 export default function App() {
   const [ruta, setRuta] = useState(leerRuta);
   const [busqueda, setBusqueda] = useState('');
+  const [filtros, setFiltros] = useState(FILTROS_INICIALES);
   const [tema, setTema] = useState(() =>
     document.documentElement.getAttribute('data-tema') === 'oscuro' ? 'oscuro' : 'claro',
   );
   const [datos, setDatos] = useState({ laboratorios: [], clases: [] });
   const [reservas, setReservas] = useState([]);
+  const [configuracion, setConfiguracion] = useState(CONFIGURACION_POR_DEFECTO);
   const [origen, setOrigen] = useState(null); // 'servidor' | 'local' | null (todavía no se sabe)
   const [cargando, setCargando] = useState(true);
   const [intentoCarga, setIntentoCarga] = useState(0);
@@ -614,20 +717,22 @@ export default function App() {
     guardarAlmacen(CLAVE_TEMA, nuevo);
   };
 
-  // Carga de datos desde la API (patrón 7 mientras tanto). Si falla → modo de respaldo.
+  // Carga de datos desde la API (con el indicador de carga mientras tanto). Si falla → modo de respaldo.
   useEffect(() => {
     let cancelado = false;
     const esperaMinima = new Promise((resolver) => setTimeout(resolver, CARGA_MINIMA_MS));
     Promise.allSettled([obtenerDatos(), esperaMinima]).then(([resultado]) => {
       if (cancelado) return;
       if (resultado.status === 'fulfilled') {
-        const { laboratorios, clases, reservas: delServidor } = resultado.value;
+        const { laboratorios, clases, reservas: delServidor, configuracion: delServidorConfig } = resultado.value;
         setDatos({ laboratorios, clases });
         setReservas(delServidor);
+        setConfiguracion({ ...CONFIGURACION_POR_DEFECTO, ...delServidorConfig });
         setOrigen('servidor');
       } else {
         setDatos({ laboratorios: laboratoriosLocales, clases: clasesLocales });
         setReservas(cargarReservasLocales());
+        setConfiguracion(CONFIGURACION_POR_DEFECTO);
         setOrigen('local');
       }
       setCargando(false);
@@ -647,7 +752,7 @@ export default function App() {
     if (origen === 'local') guardarAlmacen(CLAVE_RESERVAS, JSON.stringify(reservas));
   }, [reservas, origen]);
 
-  // Patrón «Búsqueda global»: filtra en vivo.
+  // Patrón «Barra de búsqueda»: filtra en vivo. Patrón «Filtrado»: acota por estado y capacidad.
   const { laboratorios, clases } = datos;
   const termino = normalizar(busqueda.trim());
   const clasesEncontradas = useMemo(() => {
@@ -663,6 +768,11 @@ export default function App() {
       return texto.includes(termino) || clasesEncontradas.some((c) => c.lab === lab.codigo);
     });
   }, [termino, laboratorios, clasesEncontradas]);
+  const labsFiltrados = useMemo(() => labsEncontrados.filter((lab) => cumpleFiltros(lab, filtros)), [labsEncontrados, filtros]);
+  const clasesFiltradas = useMemo(() => {
+    const permitidos = new Set(laboratorios.filter((lab) => cumpleFiltros(lab, filtros)).map((lab) => lab.codigo));
+    return clasesEncontradas.filter((clase) => permitidos.has(clase.lab));
+  }, [clasesEncontradas, laboratorios, filtros]);
   const totalClasesPorLab = useMemo(
     () =>
       clases.reduce((acumulado, clase) => {
@@ -683,12 +793,6 @@ export default function App() {
   const limpiarBusqueda = () => {
     setBusqueda('');
     refBusqueda.current?.focus();
-  };
-
-  const probarEstadoVacio = () => {
-    setBusqueda('química');
-    navegandoDesdeBusqueda.current = false;
-    window.location.hash = '#/laboratorios';
   };
 
   const avisar = (mensaje, tipo = 'exito') => setAviso({ id: Date.now(), mensaje, tipo });
@@ -734,6 +838,70 @@ export default function App() {
     avisar('Reserva cancelada');
   };
 
+  // ---------- Panel del encargado (solo con servidor) ----------
+
+  // Crea (codigoOriginal = null) o modifica un laboratorio. Devuelve { ok } o { ok: false, errores }.
+  const guardarLaboratorio = async (valores, codigoOriginal) => {
+    if (origen !== 'servidor') return { ok: false };
+    const laboratorio = normalizarLaboratorio(valores);
+    try {
+      const guardado = codigoOriginal
+        ? await actualizarLaboratorio(codigoOriginal, laboratorio)
+        : await crearLaboratorio(laboratorio);
+      setDatos((actuales) => ({
+        ...actuales,
+        laboratorios: codigoOriginal
+          ? actuales.laboratorios.map((lab) => (lab.codigo === codigoOriginal ? guardado : lab))
+          : [...actuales.laboratorios, guardado].sort((a, b) => a.codigo.localeCompare(b.codigo)),
+      }));
+      avisar(codigoOriginal ? `Laboratorio ${guardado.codigo} actualizado` : `Laboratorio ${guardado.codigo} creado`);
+      return { ok: true };
+    } catch (error) {
+      if (error.errores) return { ok: false, errores: error.errores };
+      if (error.estado === 404) {
+        avisar(`${error.message} Pulsa «Recargar» en Laboratorios para ver la lista actual.`, 'error');
+        return { ok: false };
+      }
+      avisar('No se pudo guardar el laboratorio: el servidor no responde. Inténtalo de nuevo.', 'error');
+      return { ok: false };
+    }
+  };
+
+  const quitarLaboratorio = async (codigo) => {
+    if (origen !== 'servidor') return { ok: false };
+    try {
+      await eliminarLaboratorio(codigo);
+    } catch (error) {
+      // 409: tiene clases o reservas. El servidor explica por qué no se puede eliminar.
+      if (error.estado === 409) {
+        avisar(error.message, 'error');
+        return { ok: false };
+      }
+      if (error.estado !== 404) {
+        avisar('No se pudo eliminar el laboratorio: el servidor no responde. Inténtalo de nuevo.', 'error');
+        return { ok: false };
+      }
+      // 404: ya no existía; igual se quita de la lista.
+    }
+    setDatos((actuales) => ({ ...actuales, laboratorios: actuales.laboratorios.filter((lab) => lab.codigo !== codigo) }));
+    avisar(`Laboratorio ${codigo} eliminado`);
+    return { ok: true };
+  };
+
+  const guardarAjustes = async (valores) => {
+    if (origen !== 'servidor') return { ok: false };
+    try {
+      const guardada = await guardarConfiguracion(normalizarConfiguracion(valores));
+      setConfiguracion(guardada);
+      avisar('Configuración guardada');
+      return { ok: true, configuracion: guardada };
+    } catch (error) {
+      if (error.errores) return { ok: false, errores: error.errores };
+      avisar('No se pudo guardar la configuración: el servidor no responde. Inténtalo de nuevo.', 'error');
+      return { ok: false };
+    }
+  };
+
   // Vista actual + migas de pan.
   const seccion = ruta.vista === 'lab' ? 'laboratorios' : ruta.vista;
   const inicio = { etiqueta: 'Inicio', href: '#/' };
@@ -748,7 +916,7 @@ export default function App() {
         laboratorios={laboratorios}
         clases={clases}
         totalReservas={reservas.length}
-        onProbarVacio={probarEstadoVacio}
+        configuracion={configuracion}
       />
     );
   } else if (ruta.vista === 'laboratorios') {
@@ -759,9 +927,13 @@ export default function App() {
         cargando={cargando}
         onRecargar={recargar}
         busqueda={busqueda}
-        labsEncontrados={labsEncontrados}
-        clasesEncontradas={clasesEncontradas}
+        labsEncontrados={labsFiltrados}
+        clasesEncontradas={clasesFiltradas}
+        totalLabs={laboratorios.length}
         totalClasesPorLab={totalClasesPorLab}
+        filtros={filtros}
+        onCambiarFiltros={setFiltros}
+        onLimpiarFiltros={() => setFiltros(FILTROS_INICIALES)}
         onLimpiar={limpiarBusqueda}
       />
     );
@@ -778,6 +950,7 @@ export default function App() {
           pestanaInicial={ruta.pestana}
           cargando={cargando}
           reservas={reservas}
+          configuracion={configuracion}
           onRegistrar={registrarReserva}
         />
       );
@@ -788,7 +961,7 @@ export default function App() {
         <VistaNoEncontrada
           refTitulo={refTitulo}
           titulo={`No existe el laboratorio «${ruta.codigo}»`}
-          mensaje="Los laboratorios del 4to piso van del 236-41 al 236-46."
+          mensaje="Revisa el código en la lista de laboratorios del 4to piso."
         />
       );
     }
@@ -799,7 +972,29 @@ export default function App() {
     );
   } else if (ruta.vista === 'ayuda') {
     migas = [inicio, { etiqueta: 'Ayuda' }];
-    vista = <VistaAyuda refTitulo={refTitulo} />;
+    vista = <VistaAyuda refTitulo={refTitulo} configuracion={configuracion} />;
+  } else if (ruta.vista === 'panel') {
+    const actual = SECCIONES_PANEL.find((item) => item.id === ruta.seccion);
+    migas =
+      ruta.seccion === 'inicio'
+        ? [inicio, { etiqueta: 'Panel' }]
+        : [inicio, { etiqueta: 'Panel', href: '#/panel' }, { etiqueta: actual.etiqueta }];
+    vista = (
+      <PanelEncargado
+        seccion={ruta.seccion}
+        refTitulo={refTitulo}
+        cargando={cargando}
+        laboratorios={laboratorios}
+        clases={clases}
+        reservas={reservas}
+        configuracion={configuracion}
+        soloLectura={origen !== 'servidor'}
+        onPedirCancelacion={setReservaACancelar}
+        onGuardarLaboratorio={guardarLaboratorio}
+        onEliminarLaboratorio={quitarLaboratorio}
+        onGuardarConfiguracion={guardarAjustes}
+      />
+    );
   } else {
     migas = [inicio, { etiqueta: 'Página no encontrada' }];
     vista = (

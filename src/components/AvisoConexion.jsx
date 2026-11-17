@@ -4,6 +4,8 @@
  * fallar en silencio. Se explica qué pasó, qué significa para el usuario (sus reservas se
  * guardan solo en este navegador) y se ofrece una salida: «Reintentar».
  * La región role="status" existe siempre para que el lector de pantalla anuncie el aviso.
+ * En el panel del encargado, AvisoSoloLectura explica por qué el CRUD y la configuración
+ * están deshabilitados mientras no hay servidor.
  */
 export default function AvisoConexion({ visible, reintentando, onReintentar }) {
   return (
@@ -29,6 +31,17 @@ export default function AvisoConexion({ visible, reintentando, onReintentar }) {
           </button>
         </div>
       )}
+    </div>
+  );
+}
+
+export function AvisoSoloLectura() {
+  return (
+    <div className="aviso-bloque aviso-mantenimiento aviso-solo-lectura">
+      <p>
+        <strong>Modo de solo lectura.</strong> Sin conexión con el servidor no se pueden crear, editar ni eliminar
+        laboratorios, ni cambiar la configuración. Pulsa «Reintentar» en el aviso de arriba cuando el servidor vuelva.
+      </p>
     </div>
   );
 }

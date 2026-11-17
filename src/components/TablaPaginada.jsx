@@ -1,9 +1,11 @@
 /*
- * Patrón: PAGINACIÓN.
- * Problema que resuelve: una tabla larga (el horario de un laboratorio) abruma y obliga
- * a hacer mucho scroll. Se muestran 5 filas por página con «Anterior», «Siguiente» y los
- * números de página; el texto «Mostrando 1–5 de 8» dice en qué parte de la lista estás.
- * Los botones en los extremos usan aria-disabled para que el foco no se pierda.
+ * Patrones: PAGINACIÓN + TABLA DE DATOS.
+ * Problema que resuelve: una tabla larga (el horario de un laboratorio, las reservas del panel)
+ * abruma y obliga a hacer mucho scroll. Se muestran 5 filas por página con «Anterior»,
+ * «Siguiente» y los números de página; el texto «Mostrando 1–5 de 8» dice en qué parte de la
+ * lista estás. Los botones en los extremos usan aria-disabled para que el foco no se pierda.
+ * La tabla usa encabezados th scope="col" y un caption para lectores de pantalla, y en pantallas
+ * angostas se desplaza dentro de su propio marco (región enfocable) sin mover la página.
  */
 import { useState } from 'react';
 

@@ -1,10 +1,11 @@
 /*
- * Patrón: SKELETON DE CARGA.
- * Problema que resuelve: mientras llegan los datos, un spinner no dice qué va a aparecer.
- * El skeleton dibuja la forma del contenido (tarjetas grises animadas), la espera se
- * percibe más corta y la página no "salta" cuando llegan los datos.
- * Se anuncia «Cargando…» a lectores de pantalla y la animación se apaga si el sistema
- * pide movimiento reducido.
+ * Patrón: INDICADOR DE CARGA (Loader), variante skeleton para las cargas de página.
+ * Problema que resuelve: mientras llegan los datos del servidor, una página vacía parece rota
+ * y un spinner solo no dice qué va a aparecer. El skeleton dibuja la forma del contenido
+ * (tarjetas y líneas grises animadas), la espera se percibe más corta y la página no "salta"
+ * cuando llegan los datos. Se anuncia «Cargando…» a lectores de pantalla y la animación se
+ * apaga si el sistema pide movimiento reducido.
+ * La otra variante del mismo patrón es el spinner dentro de los botones (IndicadorCarga.jsx).
  */
 function Bloque({ ancho = '100%', alto = '1rem', className = '' }) {
   return <span className={`skeleton-bloque ${className}`} style={{ width: ancho, height: alto }} />;
@@ -54,6 +55,14 @@ export default function Skeleton({ variante = 'tarjetas', cantidad = 6, texto = 
           {Array.from({ length: cantidad }, (_, indice) => (
             <DatoFantasma key={indice} />
           ))}
+        </div>
+      )}
+      {variante === 'carrusel' && (
+        <div className="skeleton-carrusel" aria-hidden="true">
+          <Bloque ancho="30%" />
+          <Bloque ancho="70%" alto="2rem" />
+          <Bloque ancho="85%" />
+          <Bloque ancho="160px" alto="2.75rem" />
         </div>
       )}
       {variante === 'lineas' && (

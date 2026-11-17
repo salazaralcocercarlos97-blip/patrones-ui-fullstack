@@ -1,5 +1,5 @@
 /*
- * Patrón: TARJETAS.
+ * Patrón: TARJETAS (Cards).
  * Problema que resuelve: comparar seis laboratorios de un vistazo. Cada tarjeta agrupa
  * los datos clave (código, capacidad, estado con etiqueta de color + texto, clases por
  * semana) y una sola acción clara: «Ver laboratorio». Se acomodan en una cuadrícula que

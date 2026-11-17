@@ -1,5 +1,5 @@
 /*
- * Patrón: PESTAÑAS.
+ * Patrón: PESTAÑAS (Tabs).
  * Problema que resuelve: el detalle de un laboratorio tiene tres tipos de información
  * (datos, horario y formulario de reserva). Las pestañas los separan sin cambiar de página.
  * Accesible según WAI-ARIA: role="tablist"/"tab"/"tabpanel", flechas ← → para moverse,

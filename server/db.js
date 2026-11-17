@@ -1,11 +1,13 @@
 // Conexión a la base de datos SQLite (módulo node:sqlite, incluido en Node 22.13+).
 // No hace falta instalar un servidor de base de datos: todo vive en un archivo.
 // La primera vez crea las tablas (esquema.sql) y las llena con los datos de src/data.js.
+// La tabla «configuracion» se siembra por separado: así una base creada con una versión
+// anterior (que ya tiene laboratorios) también recibe los valores por defecto.
 import { DatabaseSync } from 'node:sqlite';
 import { mkdirSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { clases, laboratorios, reservasDeEjemplo } from '../src/data.js';
+import { CONFIGURACION_POR_DEFECTO, clases, laboratorios, reservasDeEjemplo } from '../src/data.js';
 
 const CARPETA = dirname(fileURLToPath(import.meta.url));
 export const RUTA_DB = join(CARPETA, 'datos', 'laboratorios.db');
@@ -57,6 +59,26 @@ function sembrar(db) {
   });
 }
 
+// Nombre de cada valor de la configuración en el objeto de la API y en la tabla (clave).
+export const CLAVES_CONFIGURACION = {
+  horaApertura: 'hora_apertura',
+  horaCierre: 'hora_cierre',
+  duracionMaximaHoras: 'duracion_maxima_horas',
+  anticipacionMaximaDias: 'anticipacion_maxima_dias',
+};
+
+// Inserta los valores por defecto (07:00, 22:45, 4 h y 60 días) si la tabla está vacía.
+function sembrarConfiguracion(db) {
+  const { total } = db.prepare('SELECT COUNT(*) AS total FROM configuracion').get();
+  if (total > 0) return;
+  const insertar = db.prepare('INSERT INTO configuracion (clave, valor) VALUES (?, ?)');
+  enTransaccion(db, () => {
+    for (const [nombre, clave] of Object.entries(CLAVES_CONFIGURACION)) {
+      insertar.run(clave, String(CONFIGURACION_POR_DEFECTO[nombre]));
+    }
+  });
+}
+
 export function abrirBase() {
   mkdirSync(dirname(RUTA_DB), { recursive: true });
   const db = new DatabaseSync(RUTA_DB);
@@ -64,6 +86,7 @@ export function abrirBase() {
   db.exec(ESQUEMA);
   const { total } = db.prepare('SELECT COUNT(*) AS total FROM laboratorio').get();
   if (total === 0) sembrar(db);
+  sembrarConfiguracion(db);
   return db;
 }
 
@@ -73,12 +96,13 @@ export function reiniciarBase() {
   const db = new DatabaseSync(RUTA_DB);
   db.exec('PRAGMA foreign_keys = OFF;');
   enTransaccion(db, () => {
-    for (const tabla of ['reserva', 'clase', 'docente', 'materia', 'laboratorio_software', 'laboratorio']) {
+    for (const tabla of ['configuracion', 'reserva', 'clase', 'docente', 'materia', 'laboratorio_software', 'laboratorio']) {
       db.exec(`DROP TABLE IF EXISTS ${tabla}`);
     }
   });
   db.exec('PRAGMA foreign_keys = ON;');
   db.exec(ESQUEMA);
   sembrar(db);
+  sembrarConfiguracion(db);
   return db;
 }

@@ -1,6 +1,7 @@
 /*
- * Patrón: VALIDACIÓN EN LÍNEA.
- * Problema que resuelve: que el usuario no descubra todos sus errores recién al enviar.
+ * Patrón: FORMULARIO DE REGISTRO (registro de una reserva) con VALIDACIÓN EN LÍNEA.
+ * Problema que resuelve: registrar una reserva pide varios datos con reglas (fecha, horario,
+ * duración, choques con clases), y el usuario no debería descubrir todos sus errores recién al enviar.
  * Cada campo se valida al salir de él (onBlur) y el mensaje aparece junto al campo, en
  * español y diciendo cómo corregirlo. En cuanto el valor es correcto, el error se borra
  * mientras escribe. Accesible: aria-invalid + aria-describedby enlazan cada campo con su
@@ -8,10 +9,13 @@
  * Versión con backend: las reglas viven en src/reglas.js y el servidor las vuelve a
  * aplicar al guardar; si el servidor rechaza algo (por ejemplo, otra persona reservó ese
  * horario un momento antes), su mensaje aparece junto al campo igual que los del navegador.
+ * El horario de atención, la duración máxima y la anticipación máxima vienen de la configuración
+ * del panel del encargado. Mientras el servidor responde, el botón muestra el INDICADOR DE CARGA.
  */
 import { useId, useRef, useState } from 'react';
-import { HORA_APERTURA, HORA_CIERRE, TIPOS_RESERVA, hoyISO } from '../data.js';
-import { MOTIVO_MAXIMO, MOTIVO_MINIMO, ORDEN_CAMPOS, validarCampo, validarReserva } from '../reglas.js';
+import { TIPOS_RESERVA, hoyISO } from '../data.js';
+import { MOTIVO_MAXIMO, MOTIVO_MINIMO, ORDEN_CAMPOS, fechaMaximaReserva, validarCampo, validarReserva } from '../reglas.js';
+import BotonConCarga from './IndicadorCarga.jsx';
 
 const VALORES_INICIALES = { fecha: '', horaInicio: '', horaFin: '', tipo: '', motivo: '' };
 
@@ -25,7 +29,7 @@ function textoResumen(errores) {
   return campos.length === 1 ? 'Revisa 1 campo marcado.' : `Revisa los ${campos.length} campos marcados.`;
 }
 
-export default function ReservaForm({ laboratorio, clases, reservas, onRegistrar }) {
+export default function ReservaForm({ laboratorio, clases, reservas, configuracion, onRegistrar }) {
   const idBase = useId();
   const [valores, setValores] = useState(VALORES_INICIALES);
   const [errores, setErrores] = useState({});
@@ -40,7 +44,8 @@ export default function ReservaForm({ laboratorio, clases, reservas, onRegistrar
   };
 
   const enMantenimiento = laboratorio.estado === 'MANTENIMIENTO';
-  const contexto = { laboratorio, clases, reservas };
+  const contexto = { laboratorio, clases, reservas, configuracion };
+  const { horaApertura, horaCierre, duracionMaximaHoras, anticipacionMaximaDias } = configuracion;
   const id = (campo) => `${idBase}-${campo}`;
 
   const enfocarPrimerError = (encontrados) => {
@@ -165,7 +170,9 @@ export default function ReservaForm({ laboratorio, clases, reservas, onRegistrar
         </div>
       ) : (
         <p className="formulario-intro">
-          Todos los campos son obligatorios. Atención de lunes a sábado, {HORA_APERTURA} a {HORA_CIERRE}.
+          Todos los campos son obligatorios. Atención de lunes a sábado, {horaApertura} a {horaCierre}. Cada reserva
+          puede durar hasta {duracionMaximaHoras} h y hacerse con hasta {anticipacionMaximaDias}{' '}
+          {Number(anticipacionMaximaDias) === 1 ? 'día' : 'días'} de anticipación.
         </p>
       )}
 
@@ -174,19 +181,19 @@ export default function ReservaForm({ laboratorio, clases, reservas, onRegistrar
 
         <div className="campo">
           <label htmlFor={id('fecha')}>Fecha</label>
-          <input type="date" min={hoyISO()} {...propsCampo('fecha')} />
+          <input type="date" min={hoyISO()} max={fechaMaximaReserva(configuracion)} {...propsCampo('fecha')} />
           {mensajeError('fecha')}
         </div>
 
         <div className="campo-fila">
           <div className="campo">
             <label htmlFor={id('horaInicio')}>Hora de inicio</label>
-            <input type="time" min={HORA_APERTURA} max={HORA_CIERRE} step="300" {...propsCampo('horaInicio')} />
+            <input type="time" min={horaApertura} max={horaCierre} step="300" {...propsCampo('horaInicio')} />
             {mensajeError('horaInicio')}
           </div>
           <div className="campo">
             <label htmlFor={id('horaFin')}>Hora de fin</label>
-            <input type="time" min={HORA_APERTURA} max={HORA_CIERRE} step="300" {...propsCampo('horaFin')} />
+            <input type="time" min={horaApertura} max={horaCierre} step="300" {...propsCampo('horaFin')} />
             {mensajeError('horaFin')}
           </div>
         </div>
@@ -215,9 +222,7 @@ export default function ReservaForm({ laboratorio, clases, reservas, onRegistrar
         </div>
 
         <div className="formulario-acciones">
-          <button type="submit" className="boton boton-primario" aria-disabled={enviando}>
-            {enviando ? 'Registrando…' : 'Registrar reserva'}
-          </button>
+          <BotonConCarga type="submit" cargando={enviando} texto="Registrar reserva" textoCargando="Registrando…" />
           <p className="formulario-resumen" aria-live="polite">
             {resumen}
           </p>

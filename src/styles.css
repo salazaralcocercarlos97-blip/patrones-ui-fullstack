@@ -335,7 +335,7 @@ fieldset:disabled .boton {
   cursor: not-allowed;
 }
 
-/* ---------- Cabecera (patrones 1, 2 y 3) ---------- */
+/* ---------- Cabecera: barra de navegación, búsqueda y menú hamburguesa ---------- */
 .cabecera {
   position: sticky;
   top: 0;
@@ -392,6 +392,7 @@ fieldset:disabled .boton {
   flex-direction: column;
   line-height: 1.2;
   min-width: 0;
+  white-space: nowrap;
 }
 
 .marca-nombre {
@@ -666,7 +667,7 @@ fieldset:disabled .boton {
   font-size: 1.0625rem;
 }
 
-/* ---------- Grillas y tarjetas (patrón 6) ---------- */
+/* ---------- Grillas y tarjetas ---------- */
 .grilla {
   display: grid;
   gap: 16px;
@@ -797,49 +798,7 @@ fieldset:disabled .boton {
   color: var(--texto);
 }
 
-/* Lista de patrones (inicio) */
-.lista-patrones {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 12px;
-}
-
-.patron {
-  display: flex;
-  gap: 12px;
-  padding: 16px;
-  border: 1px solid var(--borde);
-  border-radius: var(--radio-grande);
-  background: var(--superficie);
-}
-
-.patron-numero {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--primario-suave);
-  color: var(--texto);
-  font-weight: 700;
-  font-size: 0.875rem;
-  flex-shrink: 0;
-}
-
-.patron-descripcion {
-  margin-top: 2px;
-  color: var(--texto-suave);
-  font-size: 0.9375rem;
-}
-
-.patron-donde {
-  margin-top: 6px;
-  font-size: 0.9375rem;
-  font-weight: 600;
-}
-
-/* ---------- Pestañas (patrón 5) ---------- */
+/* ---------- Pestañas ---------- */
 .pestanas-lista {
   display: flex;
   gap: 4px;
@@ -955,7 +914,7 @@ fieldset:disabled .boton {
   font-size: 0.9375rem;
 }
 
-/* ---------- Tabla paginada (patrón 12) ---------- */
+/* ---------- Tabla de datos y paginación ---------- */
 .tabla-contenedor {
   overflow-x: auto;
   border: 1px solid var(--borde);
@@ -1039,7 +998,7 @@ fieldset:disabled .boton {
   cursor: not-allowed;
 }
 
-/* ---------- Formulario (patrón 9) ---------- */
+/* ---------- Formularios ---------- */
 .formulario {
   max-width: 640px;
 }
@@ -1208,7 +1167,7 @@ fieldset:disabled .boton {
   align-self: flex-start;
 }
 
-/* ---------- Estado vacío (patrón 8) ---------- */
+/* ---------- Estado vacío ---------- */
 .vacio {
   display: flex;
   flex-direction: column;
@@ -1231,7 +1190,7 @@ fieldset:disabled .boton {
   color: var(--texto-suave);
 }
 
-/* ---------- Skeleton (patrón 7) ---------- */
+/* ---------- Indicador de carga: skeleton ---------- */
 .skeleton-tarjeta {
   display: flex;
   flex-direction: column;
@@ -1287,7 +1246,7 @@ fieldset:disabled .boton {
   }
 }
 
-/* ---------- Acordeón (patrón 13) ---------- */
+/* ---------- Acordeón ---------- */
 .acordeon {
   border: 1px solid var(--borde);
   border-radius: var(--radio-grande);
@@ -1342,7 +1301,7 @@ fieldset:disabled .boton {
   max-width: 70ch;
 }
 
-/* ---------- Modal (patrón 10) ---------- */
+/* ---------- Ventana modal ---------- */
 .modal-fondo {
   position: fixed;
   inset: 0;
@@ -1396,7 +1355,7 @@ fieldset:disabled .boton {
   }
 }
 
-/* ---------- Toast (patrón 11) ---------- */
+/* ---------- Notificación toast ---------- */
 .toast-region {
   position: fixed;
   left: 16px;
@@ -1525,6 +1484,7 @@ fieldset:disabled .boton {
   .nav-principal a {
     min-height: 44px;
     padding: 8px 12px;
+    white-space: nowrap;
   }
 
   .nav-principal a[aria-current='page'] {
@@ -1548,6 +1508,19 @@ fieldset:disabled .boton {
     right: 24px;
     bottom: 24px;
     justify-content: flex-end;
+  }
+}
+
+/* Tableta (768–999 px): con cinco enlaces en la barra no cabe el nombre junto al logo.
+   Se ve solo el logo; el nombre sigue siendo el texto del enlace para los lectores de pantalla. */
+@media (min-width: 768px) and (max-width: 999px) {
+  .marca-texto {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
   }
 }
 
@@ -1644,12 +1617,973 @@ fieldset:disabled .boton {
   font-size: 0.8125rem;
 }
 
-/* Categoría de cada patrón en la lista de Inicio */
-.patron-categoria {
-  margin-bottom: 2px;
-  color: var(--texto-suave);
-  font-size: 0.75rem;
+/* ==========================================================================
+   Patrones nuevos: carrusel, panel del encargado, filtrado e indicador de carga
+   ========================================================================== */
+
+:root {
+  --carrusel-fondo: #1f4e79;
+  --carrusel-texto: #ffffff;
+  --carrusel-suave: #d3e1ee;
+  --carrusel-borde: rgba(255, 255, 255, 0.5);
+  --carrusel-boton: rgba(255, 255, 255, 0.1);
+  --carrusel-boton-hover: rgba(255, 255, 255, 0.2);
+  --carrusel-ilustracion: rgba(255, 255, 255, 0.3);
+  --barra-alta: #b06d00;
+}
+
+:root[data-tema='oscuro'] {
+  --carrusel-fondo: #10263d;
+  --carrusel-suave: #b7c9dc;
+  --barra-alta: #f3c774;
+}
+
+.boton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ---------- Indicador de carga: spinner dentro del botón ---------- */
+.spinner {
+  display: inline-block;
+  width: 1.05em;
+  height: 1.05em;
+  flex-shrink: 0;
+  border: 2.5px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: girar 0.75s linear infinite;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.boton[aria-disabled='true'] .spinner {
+  opacity: 1;
+}
+
+.skeleton-carrusel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+  min-height: 250px;
+  margin-top: 24px;
+  padding: 32px;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-grande);
+  background: var(--superficie);
+}
+
+/* ---------- Carrusel principal ---------- */
+.carrusel {
+  position: relative;
+  margin-top: 24px;
+  border-radius: var(--radio-grande);
+  background: var(--carrusel-fondo);
+  color: var(--carrusel-texto);
+  box-shadow: var(--sombra);
+  overflow: hidden;
+}
+
+.carrusel :focus-visible {
+  outline-color: #ffffff;
+}
+
+.carrusel-diapositivas {
+  display: grid;
+}
+
+/* Todas las diapositivas ocupan la misma celda: el alto no cambia al pasar de una a otra. */
+.carrusel-diapositiva {
+  grid-area: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 68px 20px 16px;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 400ms ease,
+    visibility 400ms;
+}
+
+.carrusel-diapositiva.activa {
+  opacity: 1;
+  visibility: visible;
+}
+
+.carrusel-texto {
+  flex: 1 1 auto;
+  max-width: 720px;
+}
+
+.carrusel-etiqueta {
+  margin-bottom: 6px;
+  color: var(--carrusel-suave);
+  font-size: 0.8125rem;
   font-weight: 650;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+}
+
+.carrusel-titulo {
+  font-size: 1.5rem;
+  line-height: 1.2;
+}
+
+.carrusel-descripcion {
+  margin: 10px 0 18px;
+  color: var(--carrusel-suave);
+  font-size: 1.0625rem;
+}
+
+.carrusel-accion {
+  background: #ffffff;
+  color: #1f4e79;
+}
+
+.carrusel-accion:hover {
+  background: #e3ecf5;
+  color: #173c5e;
+}
+
+.carrusel-ilustracion {
+  display: none;
+  width: 132px;
+  height: 132px;
+  color: var(--carrusel-ilustracion);
+}
+
+.carrusel-boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 40px;
+  min-height: 40px;
+  padding: 0 10px;
+  border: 1px solid var(--carrusel-borde);
+  border-radius: var(--radio);
+  background: var(--carrusel-boton);
+  color: var(--carrusel-texto);
+  font-weight: 600;
+  font-size: 0.9375rem;
+}
+
+.carrusel-boton:hover {
+  background: var(--carrusel-boton-hover);
+}
+
+.carrusel-rotacion {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 1;
+  padding: 0 12px 0 10px;
+}
+
+.carrusel-controles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  padding: 0 14px 14px 12px;
+}
+
+.carrusel-puntos {
+  display: flex;
+  align-items: center;
+}
+
+.carrusel-punto {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radio);
+  background: transparent;
+}
+
+.carrusel-punto span {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--carrusel-borde);
+  transition:
+    width var(--duracion) ease,
+    background-color var(--duracion) ease;
+}
+
+.carrusel-punto:hover span {
+  background: var(--carrusel-suave);
+}
+
+.carrusel-punto[aria-current='true'] span {
+  width: 22px;
+  background: #ffffff;
+}
+
+.carrusel-flechas {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.carrusel-contador {
+  margin-right: 4px;
+  color: var(--carrusel-suave);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ---------- Filtrado ---------- */
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 14px 24px;
+  margin-bottom: 16px;
+  padding: 16px;
+}
+
+.filtros-titulo {
+  flex: 1 1 100%;
+  font-size: 1rem;
+}
+
+.filtros-grupos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 28px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.filtro-grupo {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.filtro-grupo legend {
+  margin-bottom: 6px;
+  padding: 0;
+  color: var(--texto-suave);
+  font-size: 0.875rem;
+  font-weight: 650;
+}
+
+.filtro-opciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.filtro-opcion {
+  position: relative;
+  display: inline-flex;
+}
+
+/* El radio nativo sigue ahí (enfocable, con flechas) pero invisible; la «pastilla» es el span. */
+.filtro-opcion input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.filtro-opcion span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 6px 14px;
+  border: 1px solid var(--borde-campo);
+  border-radius: 999px;
+  background: var(--superficie);
+  color: var(--texto);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.filtro-opcion:hover span {
+  background: var(--superficie-2);
+}
+
+.filtro-opcion input:checked + span {
+  border-color: var(--primario);
+  background: var(--primario);
+  color: var(--primario-contraste);
+}
+
+/* Marca de verificación: el estado elegido no depende solo del color. */
+.filtro-opcion input:checked + span::before {
+  content: '';
+  width: 10px;
+  height: 6px;
+  margin: -3px 2px 0 0;
+  border-left: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
+}
+
+.filtro-opcion input:focus-visible + span {
+  outline: 3px solid var(--foco);
+  outline-offset: 2px;
+}
+
+.filtros-limpiar {
+  margin-left: auto;
+}
+
+/* ---------- Panel del encargado: menú lateral ---------- */
+.panel {
+  display: grid;
+  gap: 20px;
+}
+
+.panel-contenido {
+  min-width: 0;
+}
+
+.menu-lateral {
+  min-width: 0;
+}
+
+.menu-lateral-titulo {
+  display: none;
+}
+
+/* Móvil: barra horizontal desplazable (el desplazamiento queda dentro de la barra). */
+.menu-lateral ul {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  overflow-x: auto;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-grande);
+  background: var(--superficie);
+  scrollbar-width: thin;
+}
+
+.menu-lateral a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 12px;
+  border-radius: var(--radio);
+  color: var(--texto-suave);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.menu-lateral a:hover {
+  background: var(--superficie-2);
+  color: var(--texto);
+}
+
+.menu-lateral a[aria-current='page'] {
+  background: var(--primario-suave);
+  color: var(--primario);
+  box-shadow: inset 0 -3px 0 var(--primario);
+}
+
+.menu-lateral a:focus-visible {
+  outline-offset: -3px;
+}
+
+.menu-lateral-nota {
+  margin-top: 8px;
+  color: var(--texto-suave);
+  font-size: 0.8125rem;
+}
+
+/* ---------- Panel de control: tarjetas KPI y barras de progreso ---------- */
+.grilla-kpi {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 16px;
+}
+
+.kpi-icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  background: var(--primario-suave);
+  color: var(--primario);
+}
+
+.kpi-etiqueta {
+  color: var(--texto-suave);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+/* Desde que hay varias tarjetas por fila, la etiqueta reserva dos líneas: los números quedan alineados. */
+@media (min-width: 900px) {
+  .kpi-etiqueta {
+    min-height: 2.6em;
+  }
+}
+
+.kpi-valor {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.kpi-detalle {
+  color: var(--texto-suave);
+  font-size: 0.8125rem;
+}
+
+.panel-columnas {
+  display: grid;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.panel-bloque {
+  padding: 20px;
+}
+
+.panel-bloque-titulo {
+  margin-bottom: 4px;
+  font-size: 1.125rem;
+}
+
+.panel-bloque-texto {
+  margin-bottom: 16px;
+  color: var(--texto-suave);
+  font-size: 0.9375rem;
+}
+
+.lista-barras {
+  display: grid;
+  gap: 14px;
+}
+
+.barra-cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin-bottom: 6px;
+}
+
+.barra-etiqueta {
+  font-weight: 650;
+}
+
+.barra-valor {
+  margin-left: auto;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.barra-alerta {
+  color: var(--aviso-texto);
+}
+
+.barra-pista {
+  height: 10px;
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  background: var(--superficie-2);
+  overflow: hidden;
+}
+
+.barra-relleno {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--primario);
+  transition: width 400ms ease;
+}
+
+.barra-alta .barra-relleno {
+  background: var(--barra-alta);
+}
+
+.barra-detalle {
+  margin-top: 4px;
+  color: var(--texto-suave);
+  font-size: 0.8125rem;
+}
+
+.lista-proximas li {
+  padding: 10px 0;
+  border-top: 1px solid var(--borde);
+}
+
+.lista-proximas li:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.proxima-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.proxima-fecha {
+  color: var(--texto-suave);
+  font-size: 0.9375rem;
+}
+
+.enlace-flecha {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 4px 0;
+  font-weight: 600;
+}
+
+/* ---------- Tabla de datos: acciones por fila ---------- */
+.acciones-fila {
+  display: flex;
+  gap: 6px;
+  margin-block: -7px; /* centra los botones con la primera línea de texto de la fila */
+}
+
+.boton-fila {
+  min-height: 36px;
+  padding: 6px 12px;
+  border: 1px solid var(--borde-campo);
+  border-radius: var(--radio);
+  background: var(--superficie);
+  color: var(--texto);
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.boton-fila:hover {
+  background: var(--superficie-2);
+}
+
+.boton-fila-peligro {
+  border-color: currentColor;
+  color: var(--peligro);
+}
+
+.boton-fila-peligro:hover {
+  background: var(--peligro-fondo);
+}
+
+.boton-fila:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.celda-motivo {
+  display: block;
+  min-width: 180px;
+  max-width: 34ch;
+}
+
+/* ---------- Ventana modal: variantes informativa y con formulario ---------- */
+.modal {
+  max-height: calc(100vh - 32px);
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+}
+
+.modal-amplio {
+  max-width: 680px;
+}
+
+.modal-cuerpo .formulario {
+  max-width: none;
+}
+
+.lista-datos-modal {
+  margin-top: 4px;
+}
+
+.lista-datos-modal dd {
+  color: var(--texto);
+}
+
+.formulario-modal .formulario-intro {
+  margin-bottom: 16px;
+}
+
+.formulario-modal .formulario-campos {
+  gap: 14px;
+}
+
+.formulario-modal .campo-fila {
+  gap: 14px 18px;
+}
+
+.formulario-modal .campo textarea {
+  min-height: 68px;
+}
+
+.formulario-acciones-modal {
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.formulario-acciones-modal .formulario-resumen {
+  margin-right: auto;
+}
+
+.campo-radios {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.campo-radios legend {
+  margin-bottom: 4px;
+  padding: 0;
+  font-weight: 600;
+}
+
+.radios-en-linea {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 24px;
+}
+
+.campo .radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.radio input {
+  width: 20px;
+  height: 20px;
+  min-height: 0;
+  margin: 0;
+  accent-color: var(--primario);
+}
+
+.chips-previa {
+  gap: 6px;
+}
+
+.chips-previa li {
+  padding: 2px 10px;
+  background: var(--superficie-2);
+  font-size: 0.8125rem;
+}
+
+/* ---------- Reportes ---------- */
+.grilla-graficos {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.grafico {
+  margin: 0;
+  padding: 20px;
+}
+
+.grafico-titulo {
+  font-size: 1.125rem;
+}
+
+.grafico-descripcion {
+  margin-top: 2px;
+  color: var(--texto-suave);
+  font-size: 0.875rem;
+}
+
+.grafico-lista {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+/* Móvil: etiqueta y valor arriba, barra debajo. Desde 600 px: todo en una fila. */
+.grafico-fila {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'etiqueta valor'
+    'pista pista';
+  align-items: center;
+  gap: 4px 12px;
+}
+
+.grafico-etiqueta {
+  grid-area: etiqueta;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.grafico-pista {
+  grid-area: pista;
+  height: 14px;
+  border-radius: 4px;
+  background: var(--superficie-2);
+  overflow: hidden;
+}
+
+.grafico-barra {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--primario);
+}
+
+.grafico-valor {
+  grid-area: valor;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.grafico-unidad,
+.grafico-porcentaje {
+  color: var(--texto-suave);
+  font-weight: 400;
+}
+
+.grafico-total {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid var(--borde);
+  color: var(--texto-suave);
+  font-size: 0.875rem;
+}
+
+.tabla-reporte {
+  min-width: 560px;
+}
+
+.tabla .numero {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.tabla tbody th,
+.tabla tfoot th {
+  background: transparent;
+  color: var(--texto);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.tabla tbody tr + tr th {
+  border-top: 1px solid var(--borde);
+}
+
+.tabla tfoot th,
+.tabla tfoot td {
+  border-top: 2px solid var(--borde-campo);
+  background: var(--superficie-2);
+  font-weight: 700;
+}
+
+.celda-ocupacion {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.celda-ocupacion-pista {
+  width: 72px;
+  height: 8px;
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  background: var(--superficie-2);
+  overflow: hidden;
+}
+
+.celda-ocupacion-pista span {
+  display: block;
+  height: 100%;
+  background: var(--primario);
+}
+
+/* ---------- Formulario de configuración ---------- */
+.formulario-configuracion {
+  max-width: 760px;
+}
+
+.grupo-ajustes {
+  min-width: 0;
+  margin: 0;
+  padding: 20px;
+}
+
+/* El legend flota para quedar dentro del borde de la tarjeta. */
+.grupo-ajustes legend {
+  float: left;
+  width: 100%;
+  margin-bottom: 4px;
+  padding: 0;
+  font-size: 1.125rem;
+  font-weight: 650;
+}
+
+.grupo-ajustes-texto {
+  clear: both;
+  margin-bottom: 16px;
+  color: var(--texto-suave);
+  font-size: 0.9375rem;
+}
+
+.campo-unidad {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.campo-unidad input {
+  max-width: 140px;
+}
+
+.campo-unidad span {
+  color: var(--texto-suave);
+  font-weight: 600;
+}
+
+.configuracion-resumen {
+  padding: 14px 16px;
+  border-left: 4px solid var(--primario);
+  border-radius: var(--radio);
+  background: var(--primario-suave);
+}
+
+.configuracion-resumen-titulo {
+  margin-bottom: 4px;
+  font-size: 1rem;
+}
+
+.aviso-solo-lectura {
+  margin-top: 0;
+}
+
+/* ---------- Responsive de los patrones nuevos ---------- */
+@media (min-width: 600px) {
+  .grafico-fila {
+    grid-template-columns: 112px minmax(0, 1fr) auto;
+    grid-template-areas: 'etiqueta pista valor';
+  }
+}
+
+@media (min-width: 768px) {
+  .carrusel-diapositiva {
+    padding: 36px 40px 20px;
+  }
+
+  .carrusel-titulo {
+    font-size: 1.875rem;
+  }
+
+  .carrusel-ilustracion {
+    display: block;
+    margin: 24px 24px 0 0;
+  }
+
+  .carrusel-controles {
+    padding: 0 24px 18px 30px;
+  }
+
+  /* Menú lateral: columna a la izquierda. */
+  .panel {
+    grid-template-columns: 210px minmax(0, 1fr);
+    gap: 28px;
+    align-items: start;
+  }
+
+  .menu-lateral-titulo {
+    display: block;
+    padding: 0 12px 8px;
+    color: var(--texto-suave);
+    font-size: 0.75rem;
+    font-weight: 650;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .menu-lateral ul {
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px;
+    overflow: visible;
+  }
+
+  .menu-lateral a[aria-current='page'] {
+    box-shadow: inset 3px 0 0 var(--primario);
+  }
+
+  .menu-lateral-nota {
+    padding: 0 12px;
+  }
+}
+
+@media (min-width: 1100px) {
+  .panel-columnas {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* El spinner no gira: queda como un anillo punteado fijo junto al texto «Guardando…». */
+  .spinner {
+    animation: none;
+    border-style: dotted;
+    border-right-color: currentColor;
+  }
+}
+
+@media (forced-colors: active) {
+  .barra-relleno,
+  .grafico-barra,
+  .celda-ocupacion-pista span {
+    background: CanvasText;
+  }
+
+  .filtro-opcion input:checked + span {
+    border-width: 3px;
+  }
+
+  .menu-lateral a[aria-current='page'] {
+    outline: 2px solid CanvasText;
+  }
 }

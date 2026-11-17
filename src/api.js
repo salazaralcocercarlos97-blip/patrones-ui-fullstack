@@ -49,12 +49,13 @@ async function pedir(ruta, opciones = {}) {
 }
 
 export async function obtenerDatos() {
-  const [laboratorios, clases, reservas] = await Promise.all([
+  const [laboratorios, clases, reservas, configuracion] = await Promise.all([
     pedir('/laboratorios'),
     pedir('/clases'),
     pedir('/reservas'),
+    pedir('/configuracion'),
   ]);
-  return { laboratorios, clases, reservas };
+  return { laboratorios, clases, reservas, configuracion };
 }
 
 export function crearReserva(reserva) {
@@ -63,4 +64,22 @@ export function crearReserva(reserva) {
 
 export function cancelarReserva(id) {
   return pedir(`/reservas/${encodeURIComponent(id)}`, { method: 'DELETE' });
+}
+
+// ---------- Panel del encargado ----------
+
+export function crearLaboratorio(laboratorio) {
+  return pedir('/laboratorios', { method: 'POST', body: JSON.stringify(laboratorio) });
+}
+
+export function actualizarLaboratorio(codigo, laboratorio) {
+  return pedir(`/laboratorios/${encodeURIComponent(codigo)}`, { method: 'PUT', body: JSON.stringify(laboratorio) });
+}
+
+export function eliminarLaboratorio(codigo) {
+  return pedir(`/laboratorios/${encodeURIComponent(codigo)}`, { method: 'DELETE' });
+}
+
+export function guardarConfiguracion(configuracion) {
+  return pedir('/configuracion', { method: 'PUT', body: JSON.stringify(configuracion) });
 }

@@ -1,11 +1,18 @@
-// Datos de la demo (no hay backend).
+// Datos iniciales de la demo: el servidor los usa para llenar la base SQLite la primera vez
+// y el frontend los usa como respaldo si el servidor no responde.
 // Capacidades y clases basadas en la oferta 2/2026 de los labs 236-41 a 236-46.
 // Descripciones, software y equipamiento son ilustrativos.
 
 export const SEMESTRE = '2/2026';
 
-export const HORA_APERTURA = '07:00';
-export const HORA_CIERRE = '22:45';
+// Configuración por defecto de las reservas (patrón «Formulario de configuración»).
+// El servidor la guarda en la tabla «configuracion»; sin servidor se usan estos valores.
+export const CONFIGURACION_POR_DEFECTO = {
+  horaApertura: '07:00',
+  horaCierre: '22:45',
+  duracionMaximaHoras: 4,
+  anticipacionMaximaDias: 60,
+};
 
 // Índice 1 = lunes … 6 = sábado (igual que dia_semana en la base de datos).
 export const DIAS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
@@ -112,28 +119,31 @@ export const clases = [
   { id: 'c33', lab: '236-46', sigla: 'INF323', materia: 'Sistemas Operativos I', grupo: 'SC', docente: 'Barroso Viruez Gino', dia: 5, inicio: '08:30', fin: '10:00' },
 ];
 
-export const preguntasFrecuentes = [
-  {
-    pregunta: '¿Con cuánta anticipación puedo reservar un laboratorio?',
-    respuesta:
-      'Puedes reservar para hoy o para cualquier día posterior, de lunes a sábado, entre las 07:00 y las 22:45. El formulario no acepta fechas pasadas ni domingos.',
-  },
-  {
-    pregunta: '¿Puedo reservar en el horario de una clase?',
-    respuesta:
-      'No. Si el horario que eliges se cruza con una clase del laboratorio, el formulario te dice con qué materia choca. Revisa la pestaña Horario antes de elegir la hora.',
-  },
-  {
-    pregunta: '¿Qué pasa si el laboratorio está en mantenimiento?',
-    respuesta:
-      'Mientras un laboratorio está en mantenimiento no recibe reservas. Su tarjeta lo indica con la etiqueta «Mantenimiento». Elige otro laboratorio disponible del piso.',
-  },
-  {
-    pregunta: '¿Cómo cancelo una reserva?',
-    respuesta:
-      'Entra a «Mis reservas» y presiona «Cancelar reserva». Te pediremos confirmación antes de liberar el laboratorio, porque la cancelación no se puede deshacer.',
-  },
-];
+// Las respuestas usan la configuración vigente (horario, duración y anticipación máximas).
+export function crearPreguntasFrecuentes(configuracion = CONFIGURACION_POR_DEFECTO) {
+  const { horaApertura, horaCierre, duracionMaximaHoras, anticipacionMaximaDias } = configuracion;
+  return [
+    {
+      pregunta: '¿Con cuánta anticipación puedo reservar un laboratorio?',
+      respuesta: `Puedes reservar desde hoy y hasta con ${anticipacionMaximaDias} ${anticipacionMaximaDias === 1 ? 'día' : 'días'} de anticipación, de lunes a sábado, entre las ${horaApertura} y las ${horaCierre}. Cada reserva puede durar hasta ${duracionMaximaHoras} h. El formulario no acepta fechas pasadas ni domingos.`,
+    },
+    {
+      pregunta: '¿Puedo reservar en el horario de una clase?',
+      respuesta:
+        'No. Si el horario que eliges se cruza con una clase del laboratorio, el formulario te dice con qué materia choca. Revisa la pestaña Horario antes de elegir la hora.',
+    },
+    {
+      pregunta: '¿Qué pasa si el laboratorio está en mantenimiento?',
+      respuesta:
+        'Mientras un laboratorio está en mantenimiento no recibe reservas. Su tarjeta lo indica con la etiqueta «Mantenimiento». Elige otro laboratorio disponible del piso.',
+    },
+    {
+      pregunta: '¿Cómo cancelo una reserva?',
+      respuesta:
+        'Entra a «Mis reservas» y presiona «Cancelar reserva». Te pediremos confirmación antes de liberar el laboratorio, porque la cancelación no se puede deshacer.',
+    },
+  ];
+}
 
 // ---- Utilidades de fecha (formato local AAAA-MM-DD, sin desfase por zona horaria) ----
 
@@ -165,6 +175,35 @@ export function formatearFecha(iso) {
   return formatoFechaLarga.format(desdeISO(iso));
 }
 
+const formatoFechaCorta = new Intl.DateTimeFormat('es-BO', {
+  weekday: 'short',
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+});
+
+export function formatearFechaCorta(iso) {
+  return formatoFechaCorta.format(desdeISO(iso));
+}
+
+// Suma (o resta) días a una fecha ISO y devuelve otra fecha ISO.
+export function sumarDias(iso, dias) {
+  const fecha = desdeISO(iso);
+  fecha.setDate(fecha.getDate() + dias);
+  return aISO(fecha);
+}
+
+// «07:30» → 450 minutos desde la medianoche.
+export function minutosDelDia(hora) {
+  const [h, m] = hora.split(':').map(Number);
+  return h * 60 + m;
+}
+
+// 450 → «07:30».
+export function horaDesdeMinutos(total) {
+  return `${dosDigitos(Math.floor(total / 60))}:${dosDigitos(total % 60)}`;
+}
+
 // Dos reservas de ejemplo para que «Mis reservas» no empiece vacía.
 // Las fechas se calculan desde hoy para que nunca queden en el pasado.
 export function reservasDeEjemplo() {
@@ -175,23 +214,23 @@ export function reservasDeEjemplo() {
     return aISO(d);
   };
   return [
-    {
-      id: 'ejemplo-1',
-      lab: '236-44',
-      fecha: fechaEn(2),
-      horaInicio: '10:00',
-      horaFin: '11:30',
-      tipo: 'EXAMEN',
-      motivo: 'Examen parcial de Programación I, grupo SA.',
-    },
-    {
-      id: 'ejemplo-2',
-      lab: '236-41',
-      fecha: fechaEn(5),
-      horaInicio: '13:00',
-      horaFin: '14:30',
-      tipo: 'PRACTICA',
-      motivo: 'Práctica de consultas SQL para Bases de Datos I.',
-    },
+      {
+        id: 'ejemplo-1',
+        lab: '236-44',
+        fecha: fechaEn(2),
+        horaInicio: '10:00',
+        horaFin: '11:30',
+        tipo: 'EXAMEN',
+        motivo: 'Examen parcial de Programación I, grupo SA.',
+      },
+      {
+        id: 'ejemplo-2',
+        lab: '236-41',
+        fecha: fechaEn(5),
+        horaInicio: '13:00',
+        horaFin: '14:30',
+        tipo: 'PRACTICA',
+        motivo: 'Práctica de consultas SQL para Bases de Datos I.',
+      },
   ];
 }

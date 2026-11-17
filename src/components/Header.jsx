@@ -1,11 +1,13 @@
 /*
- * Patrones: BÚSQUEDA GLOBAL + MENÚ HAMBURGUESA + ESTADO ACTIVO + MODO CLARO/OSCURO.
- * Problema que resuelve: el usuario necesita llegar rápido a cualquier laboratorio
- * o materia desde cualquier página (búsqueda siempre visible, atajo «/»), navegar
- * en pantallas pequeñas sin que el menú ocupe toda la pantalla (hamburguesa < 768 px,
- * se cierra con Escape), saber siempre en qué sección está (ESTADO ACTIVO: el enlace actual se
- * resalta y lleva aria-current="page") y leer cómodamente según la luz (tema que se recuerda).
- * El contador de reservas junto a «Mis reservas» es una INSIGNIA DE ESTADO (ver LabCard.jsx).
+ * Patrones: BARRA DE NAVEGACIÓN (Navbar) + BARRA DE BÚSQUEDA + ESTADO ACTIVO, y además
+ * MENÚ HAMBURGUESA y MODO CLARO/OSCURO.
+ * Problema que resuelve: el usuario necesita saber dónde está y llegar en un clic a cualquier
+ * sección (Inicio, Laboratorios, Mis reservas, Ayuda y el Panel del encargado) desde cualquier
+ * página. La barra queda fija arriba con la marca, los enlaces y la búsqueda siempre visible
+ * (atajo «/»), que filtra laboratorios y materias mientras se escribe. ESTADO ACTIVO: el enlace
+ * de la sección actual se resalta y lleva aria-current="page". En pantallas pequeñas los enlaces
+ * se agrupan en un menú hamburguesa (se cierra con Escape) y el botón de luna/sol cambia el tema,
+ * que se recuerda. El contador junto a «Mis reservas» es una INSIGNIA DE ESTADO (ver LabCard.jsx).
  */
 import { useEffect, useRef, useState } from 'react';
 
@@ -14,6 +16,7 @@ const ENLACES = [
   { id: 'laboratorios', etiqueta: 'Laboratorios', href: '#/laboratorios' },
   { id: 'reservas', etiqueta: 'Mis reservas', href: '#/reservas' },
   { id: 'ayuda', etiqueta: 'Ayuda', href: '#/ayuda' },
+  { id: 'panel', etiqueta: 'Panel', href: '#/panel' },
 ];
 
 function esCampoEditable(elemento) {

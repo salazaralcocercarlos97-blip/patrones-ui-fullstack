@@ -3,8 +3,8 @@
 -- si las tablas ya existen. Para empezar de cero: npm run db:reset
 
 CREATE TABLE IF NOT EXISTS laboratorio (
-  codigo               TEXT PRIMARY KEY,
-  capacidad            INTEGER NOT NULL CHECK (capacidad > 0),
+  codigo               TEXT PRIMARY KEY CHECK (codigo GLOB '236-[0-9][0-9]'),
+  capacidad            INTEGER NOT NULL CHECK (capacidad BETWEEN 1 AND 100),
   estado               TEXT NOT NULL DEFAULT 'DISPONIBLE' CHECK (estado IN ('DISPONIBLE', 'MANTENIMIENTO')),
   ubicacion            TEXT NOT NULL,
   descripcion          TEXT NOT NULL DEFAULT '',
@@ -51,6 +51,14 @@ CREATE TABLE IF NOT EXISTS reserva (
   motivo             TEXT NOT NULL CHECK (length(motivo) BETWEEN 10 AND 200),
   creada_en          TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
   CHECK (hora_fin > hora_inicio)
+);
+
+-- Configuración de las reservas (patrón «Formulario de configuración»), como pares clave/valor:
+-- hora_apertura, hora_cierre, duracion_maxima_horas y anticipacion_maxima_dias.
+-- Se siembra aparte (server/db.js) cuando está vacía, aunque la base ya tenga laboratorios.
+CREATE TABLE IF NOT EXISTS configuracion (
+  clave TEXT PRIMARY KEY,
+  valor TEXT NOT NULL
 );
 
 CREATE INDEX IF NOT EXISTS idx_clase_lab_dia ON clase (laboratorio_codigo, dia);
